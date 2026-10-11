@@ -1,0 +1,16 @@
+{
+  "name": "Outdoor Site kWm SAE Calculator",
+  "short_name": "SAE Calc",
+  "start_url": "Open-Meteo.html",
+  "display": "standalone",
+  "background_color": "#ffffff",
+  "theme_color": "#007bff",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "app-icon.png",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}

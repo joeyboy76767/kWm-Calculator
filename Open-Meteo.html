@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Outdoor Site kWm SAE Correction Calculator</title>
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/png" href="app-icon.png">
+    <style>
+        :root {
+            --page-bg-color: #ffffff;
+            --card-bg: #BFDBFF;
+            --pastel-yellow: #FFE58F;
+            --pastel-brown: #FFB483;
+            --environmental-bg: #C4C5C6;
+            --pastel-blue: #B1E2FE;
+            --pastel-green: #A7FEB7;
+            --pastel-red: #FEA3A1;
+            --thin-line-color: rgba(0, 0, 0, 1.0); 
+            --border-color: #000000;
+            --primary-red: #dc3545;
+            --primary-blue: #9AB5FC;
+            --text-color: #000000;
+        }
+        html, body {
+            width: 100%;
+            overflow-x: hidden;
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+            background-color: var(--page-bg-color); 
+            color: var(--text-color);
+            padding: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .calculator-card {
+            background-color: var(--card-bg); 
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
+            width: 100%;
+            max-width: 480px; 
+            padding: 16px;
+            box-sizing: border-box;
+            margin: 10px auto 0 auto;
+            border: 1px solid var(--thin-line-color);
+        }
+        .header {
+            text-align: center;
+            padding-bottom: 2px;
+            margin-bottom: 20px;
+        }
+        .header h1 {
+            font-size: 20px;
+            font-weight: 800;
+            text-align: center;
+            margin: 0;
+            color: #000000;
+        }
+        .section-title {
+            font-size: 15px;
+            font-weight: 800;
+            color: #000000;
+            text-align: center;
+            margin: 5px 0 12px 0;
+            letter-spacing: 0.5px;
+        }
+        .input-group {
+            margin-bottom: 12px;
+            padding: 14px;
+            border-radius: 8px;
+            border: 1px solid var(--thin-line-color);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .group-input { background-color: var(--pastel-brown); }
+        .group-output { background-color: var(--pastel-yellow); }
+        .group-search {
+            background-color: #ffffff;
+            margin-bottom: 15px;
+            padding: 12px 10px;
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            align-items: center;
+        }
+        .search-row {
+            display: flex;
+            gap: 8px;
+            width: 100%;
+            justify-content: center;
+            align-items: center;
+        }
+        .search-field {
+            width: 120px;
+            padding: 10px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 16px;
+            font-weight: bold;
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .environmental-wrapper {
+            background-color: var(--environmental-bg);
+            padding: 12px;
+            border-radius: 10px;
+            border: 1px solid var(--thin-line-color);
+            margin-bottom: 15px;
+            box-sizing: border-box;
+        }
+        .nested-group {
+            margin-bottom: 10px;
+            padding: 10px;
+            border-radius: 6px;
+            border: 1px solid var(--thin-line-color);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .group-altitude { background-color: var(--pastel-blue); }
+        .group-humidity { background-color: var(--pastel-green); }
+        .group-temp { background-color: var(--pastel-red); margin-bottom: 12px; }
+        .input-group label, .nested-group label {
+            display: block;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 800;
+            color: #000000;
+            margin-bottom: 8px;
+        }
+        .input-field {
+            width: 100%;
+            max-width: 180px;
+            padding: 8px;
+            border: 1px solid var(--border-color);
+            border-radius: 6px;
+            font-size: 18px;
+            font-weight: bold;
+            box-sizing: border-box;
+            text-align: center;
+            margin: 0 auto;
+            display: block;
+            background-color: #ffffff;
+        }
+        .slider-field {
+            width: 100%;
+            margin-top: 4px;
+            cursor: pointer;
+            height: 10px;
+        }
+        .button-container {
+            display: flex;
+            gap: 10px;
+            margin-top: 0;
+            padding-top: 4px;
+        }
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: 6px;
+            font-size: 15px;
+            font-weight: 800;
+            cursor: pointer;
+            transition: opacity 0.2s;
+        }
+        .btn-weather {
+            background-color: var(--primary-blue);
+            color: black;
+            padding: 10px 14px;
+            border: 1px solid var(--border-color);
+            font-size: 13px;
+            white-space: nowrap;
+        }
+        .btn-reset {
+            width: 100%;
+            background-color: var(--primary-red);
+            color: black;
+            border: 1px solid var(--border-color);
+        }
+        .btn-sae {
+            width: 100%;
+            background-color: #FFB483;
+            color: black;
+            border: 1px solid var(--border-color);
+        }
+        .status-text {
+            font-size: 12px;
+            font-weight: 800;
+            color: #555555;
+            text-align: center;
+            min-height: 15px;
+            word-wrap: break-word;
+            width: 100%;
+        }
+        .value {
+            font-size: 22px;
+            font-weight: 800;
+            color: #000000;
+        }
+        
+        /* Phone-style Blue Toggle Slider Switch Styles */
+        .toggle-container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 2px;
+        }
+        .toggle-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #000000;
+        }
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 44px;
+            height: 24px;
+        }
+        .switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .3s;
+            border-radius: 24px;
+            border: 1px solid var(--border-color);
+        }
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 3px;
+            bottom: 3px;
+            background-color: white;
+            transition: .3s;
+            border-radius: 50%;
+            border: 1px solid var(--border-color);
+        }
+        input:checked + .toggle-slider {
+            background-color: #007bff;
+        }
+        input:checked + .toggle-slider:before {
+            transform: translateX(20px);
+        }
+        .live-baro-display {
+            font-size: 11px;
+            font-weight: 800;
+            color: #000000;
+            margin-top: 1px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+<div class="calculator-card">
+    <div class="header">
+        <h1 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0 0 2px 0; padding: 0;">Outdoor Site kWm</h1>
+        <h2 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0; padding: 0;">SAE Correction Calculator</h2>
+    </div>
+    
+    <div class="input-group group-search">
+        <div class="search-row">
+            <!-- New Site Baro Toggle and Measurement Display Box -->
+            <div class="toggle-container">
+                <span class="toggle-label">Live Site</span>
+                <label class="switch">
+                    <input type="checkbox" id="baroToggle" onchange="toggleBarometerMode()">
+                    <span class="toggle-slider"></span>
+                </label>
+                <div id="liveBaroText" class="live-baro-display">Manual</div>
+            </div>
+            
+            <input type="input" pattern="[0-9]*" inputmode="numeric" id="zipInput" class="search-field" maxlength="5" placeholder="ZIP Code">
+            <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">Get Current ZIP Data</button>
+        </div>
+        <div id="weatherStatus" class="status-text"></div>
+    </div>
+    
+    <div class="input-group group-input">
+        <label for="baseKwm">kWm SAE Corrected</label>
+        <input type="number" id="baseKwm" class="input-field" value="0" placeholder="0">
+    </div>
+    
+    <div class="input-group group-output">
+        <label>kWm Site</label>
+        <div id="outputKwm" class="value" style="margin-top: 4px;">0.00 kWm</div>
+    </div>
+    
+    <div class="environmental-wrapper">
+        <div class="section-title">Environmental Variables</div>
+        <div class="nested-group group-altitude">
+            <label for="altitude">Altitude <span id="altitudeVal">1,447 ft</span></label>
+            <input type="range" id="altitude" class="slider-field" min="0" max="15000" value="1447" step="1">
+        </div>
+        <div class="nested-group group-humidity">
+            <label for="humidity">Humidity <span id="humidityVal">65%</span></label>
+            <input type="range" id="humidity" class="slider-field" min="0" max="100" value="65" step="1">
+        </div>
+        <div class="nested-group group-temp">
+            <label for="temp">Temperature <span id="tempVal">70°F</span></label>
+            <input type="range" id="temp" class="slider-field" min="0" max="110" value="70" step="1">
+        </div>
+        <div class="button-container">
+            <button class="btn btn-sae" onclick="setSAECorrected()">SAE Corrected</button>
+            <button class="btn btn-reset" onclick="resetForm()">Zenith PP Indoor Site</button>
+        </div>
+    </div>
+</div>
+<script>
+    const tempSlider = document.getElementById('temp');
+    const tempVal = document.getElementById('tempVal');
+    const humiditySlider = document.getElementById('humidity');
+    const humidityVal = document.getElementById('humidityVal');
+    const altitudeSlider = document.getElementById('altitude');
+    const altitudeVal = document.getElementById('altitudeVal');
+    const baseKwmInput = document.getElementById('baseKwm');
+    const outputKwm = document.getElementById('outputKwm');
+    const zipInput = document.getElementById('zipInput');
+    const weatherStatus = document.getElementById('weatherStatus');
+    const baroToggle = document.getElementById('baroToggle');
+    const liveBaroText = document.getElementById('liveBaroText');
+
+    // Global variable for the hardware chip
+    let phoneBarometerSensor = null;
+    // Keeps track of the true localized barometric pressure from the weather API
+    let liveStationPressureInHg = null;
+
+    tempSlider.addEventListener('input', (e) => {
+        tempVal.textContent = e.target.value + '°F';
+        calculateMath();
+    });
+    humiditySlider.addEventListener('input', (e) => {
+        humidityVal.textContent = e.target.value + '%';
+        calculateMath();
+    });
+    altitudeSlider.addEventListener('input', (e) => {
+        altitudeVal.textContent = parseInt(e.target.value).toLocaleString() + ' ft';
+        // Turning the slider manually switches off the live barometer link
+        if (baroToggle.checked) {
+            baroToggle.checked = false;
+            liveBaroText.textContent = "Manual";
+            liveBaroText.style.color = "#000000"; // Forces it back to BLACK when dragged
+        }
+        calculateMath();
+    });
+    baseKwmInput.addEventListener('input', calculateMath);
+    zipInput.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+            fetchLiveWeatherByZip();
+        }
+    });
+
+async function toggleBarometerMode() {
+    if (baroToggle.checked) {
+        liveBaroText.textContent = "Locating...";
+        liveBaroText.style.color = "#dc3545";
+
+        // 1. Activate the phone's built-in hardware barometer sensor if available
+        if ('AbsoluteOrientationSensor' in window || 'Sensor' in window) {
+            try {
+                // Modern phone browsers use the Generic Sensor API for pressure
+                if (!phoneBarometerSensor && typeof PressureSensor !== 'undefined') {
+                    phoneBarometerSensor = new PressureSensor({ frequency: 1 });
+                    phoneBarometerSensor.addEventListener('reading', () => {
+                        liveStationPressureInHg = phoneBarometerSensor.pressure * 0.02953;
+                        if (baroToggle.checked) {
+                            liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                            calculateMath();
+                        }
+                    });
+                    phoneBarometerSensor.start();
+                }
+            } catch (err) {
+                console.log("Hardware sensor fallback to web data.");
+            }
+        }
+
+        // 2. Activate phone GPS to automate site temperature and humidity
+        if (navigator.geolocation) {
+            navigator.geolocation.getCurrentPosition(async (position) => {
+                const lat = position.coords.latitude;
+                const lon = position.coords.longitude;
+                weatherStatus.textContent = "GPS Locked! Fetching site data...";
+                weatherStatus.style.color = "#0056b3";
+
+                try {
+                    // Pulls true temperature, humidity, and elevation for your exact GPS spot
+                    const weatherResponse = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,surface_pressure&temperature_unit=fahrenheit&timezone=auto");
+                    const weatherData = await weatherResponse.json();
+                    
+                    if (weatherData.current) {
+                        tempSlider.value = Math.round(weatherData.current.temperature_2m);
+                        tempVal.textContent = tempSlider.value + '°F';
+                        humiditySlider.value = Math.round(weatherData.current.relative_humidity_2m);
+                        humidityVal.textContent = humiditySlider.value + '%';
+                        
+                        // If phone lacks a physical barometer chip, fall back to Open-Meteo's ground pressure
+                        if (liveStationPressureInHg === null && weatherData.current.surface_pressure) {
+                            liveStationPressureInHg = weatherData.current.surface_pressure * 0.02953;
+                            liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                        }
+                        
+                        const elevationFeet = Math.round((weatherData.elevation || 0) * 3.28084);
+                        altitudeSlider.value = elevationFeet;
+                        altitudeVal.textContent = elevationFeet.toLocaleString() + ' ft';
+                        
+                        weatherStatus.textContent = "Live Site Tracking Active";
+                        weatherStatus.style.color = "#28a745";
+                        liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                        calculateMath();
+                    }
+                } catch (error) {
+                    weatherStatus.textContent = "GPS Weather network error.";
+                    weatherStatus.style.color = "#primary-red";
+                }
+            }, (error) => {
+                weatherStatus.textContent = "GPS access denied or unavailable.";
+                weatherStatus.style.color = "#primary-red";
+                liveBaroText.textContent = "Manual";
+                baroToggle.checked = false;
+            });
+        } else {
+            weatherStatus.textContent = "Device does not support GPS.";
+            weatherStatus.style.color = "#primary-red";
+            baroToggle.checked = false;
+        }
+    } else {
+        // Turning the toggle OFF safely disconnects everything
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000";
+        if (phoneBarometerSensor) {
+            phoneBarometerSensor.stop();
+            phoneBarometerSensor = null;
+        }
+        calculateMath();
+    }
+}
+
+    async function fetchLiveWeatherByZip() {
+    // Disconnect and turn off all live GPS / Hardware sensor links immediately
+    if (baroToggle.checked) {
+        baroToggle.checked = false;
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000";
+        if (phoneBarometerSensor) {
+            phoneBarometerSensor.stop();
+            phoneBarometerSensor = null;
+        }
+    }
+
+        const zip = zipInput.value.trim();
+        if (!zip || zip.length !== 5 || isNaN(zip)) {
+            weatherStatus.textContent = "Enter a valid 5-digit ZIP code.";
+            weatherStatus.style.color = "#dc3545";
+            return;
+        }
+        weatherStatus.textContent = "Connecting to network...";
+        weatherStatus.style.color = "#0056b3";
+        try {
+            // [PLACE LINK ONE HERE - Geocoding API Request]
+            const geoResponse = await fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + zip + "&count=1&countryCode=US&language=en&format=json");
+            const geoData = await geoResponse.json();
+            if (!geoData.results || geoData.results.length === 0) {
+                weatherStatus.textContent = "ZIP code not found.";
+                weatherStatus.style.color = "#dc3545";
+                return;
+            }
+            const location = geoData.results[0]; 
+            const lat = location.latitude;
+            const lon = location.longitude;
+            const elevationFeet = Math.round((location.elevation || 0) * 3.28084);
+            weatherStatus.textContent = "Fetching weather data...";
+
+            // [PLACE LINK TWO HERE - Weather Forecast API Request]
+            const weatherResponse = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,surface_pressure&temperature_unit=fahrenheit&timezone=auto");
+            const weatherData = await weatherResponse.json();
+            if (!weatherData.current || !weatherData.current.surface_pressure) {
+                weatherStatus.textContent = "Server data error.";
+                weatherStatus.style.color = "#dc3545";
+                return;
+            }
+            const liveTemp = Math.round(weatherData.current.temperature_2m);
+            const liveHumidity = Math.round(weatherData.current.relative_humidity_2m);
+            
+            // Convert Open-Meteo hPa directly into Inches of Mercury for your formulas
+            liveStationPressureInHg = weatherData.current.surface_pressure * 0.02953;
+
+            altitudeSlider.value = elevationFeet;
+            altitudeVal.textContent = elevationFeet.toLocaleString() + ' ft';
+            humiditySlider.value = liveHumidity;
+            humidityVal.textContent = liveHumidity + '%';
+            tempSlider.value = liveTemp;
+            tempVal.textContent = liveTemp + '°F';
+            
+            // Automatically turn on and display the live barometer lock when ZIP data populates
+           liveBaroText.style.color = "#000000"; // Forces the "Manual" text to stay black
+            calculateMath();
+            weatherStatus.textContent = "Loaded! " + location.name + ", " + (location.admin1 || '');
+            weatherStatus.style.color = "#28a745";
+        } catch (error) {
+            console.error("API Connection Error:", error);
+            weatherStatus.textContent = "Network error. Check connection.";
+            weatherStatus.style.color = "#dc3545";
+        }
+    }
+
+    function calculateMath() {
+        let rawInputValue = parseFloat(baseKwmInput.value);
+        const kwm = isNaN(rawInputValue) ? 0 : rawInputValue;
+        const temp = parseInt(tempSlider.value);
+        const humidity = parseInt(humiditySlider.value);
+        const altitude = parseInt(altitudeSlider.value);
+        
+        // Exact SAE Standardized Baseline Targets
+        const seaLevelPressure = 29.23; 
+        const standardTempKelvin = 298.15; // 77°F
+        
+        let baroPressure;
+        if (baroToggle.checked && liveStationPressureInHg !== null) {
+            // Uses the 100% exact absolute weather station reading
+            baroPressure = liveStationPressureInHg;
+        } else {
+            // Native fallback formula using the 29.23 SAE baseline for direct slider mapping
+            baroPressure = seaLevelPressure * Math.pow((1 - 0.0000068756 * altitude), 5.25588);
+        }
+
+        const tempC = (temp - 32) * 5 / 9;
+        const satVaporPressureMb = 6.1078 * Math.pow(10, (7.5 * tempC) / (tempC + 237.3));
+        const satVaporPressureInHg = satVaporPressureMb * 0.02953;
+        const vaporPressure = satVaporPressureInHg * (humidity / 100);
+        
+        const dryAirPressure = baroPressure - vaporPressure;
+        const currentTempKelvin = tempC + 273.15;
+        
+        // Inverted SAE correction ratio processing:
+        // Ensures input and output match identically down to the decimal at standard 77°F / 0ft / 0% conditions
+        const pressureRatio = seaLevelPressure / dryAirPressure;
+        const tempRatio = Math.sqrt(currentTempKelvin / standardTempKelvin);
+        const saeCorrectionFactor = (1.18 * ((0.85 * pressureRatio * tempRatio) + 0.15)) - 0.18;
+
+        
+        let finalKwm = 0;
+        if (saeCorrectionFactor > 0) {
+            finalKwm = kwm / saeCorrectionFactor;
+        }
+        
+        outputKwm.textContent = finalKwm.toFixed(2) + ' kWm';
+    }
+
+    function resetForm() {
+        // Zeroes out the active features and restores your default shop conditions exactly as before
+        liveStationPressureInHg = null;
+        baroToggle.checked = false;
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000"; // Forces it back to BLACK
+        tempSlider.value = 70;
+        tempVal.textContent = '70°F';
+        humiditySlider.value = 65;
+        humidityVal.textContent = '65%';
+        altitudeSlider.value = 1447;
+        altitudeVal.textContent = '1,463 ft';
+        zipInput.value = "54487";
+        weatherStatus.textContent = "Loaded! Tomahawk, Wisconsin";
+        calculateMath();
+    }
+
+    function setSAECorrected() {
+        // Zeroes out the overrides and forces perfect standard atmospheric properties
+        liveStationPressureInHg = null;
+        baroToggle.checked = false;
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000"; // Forces it back to BLACK
+        tempSlider.value = 77;
+        tempVal.textContent = '77°F';
+        humiditySlider.value = 0;
+        humidityVal.textContent = '0%';
+        altitudeSlider.value = 0;
+        altitudeVal.textContent = '0 ft';
+        calculateMath();
+    }
+    
+    // Initial run on script execution
+    calculateMath();
+// Register the service worker to allow home screen phone installation
+if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('./sw.js')
+        .then(() => console.log("Service Worker Registered Stub"))
+        .catch((err) => console.log("Service Worker Failed", err));
+}
+
+</script>
+</body>
+</html>
