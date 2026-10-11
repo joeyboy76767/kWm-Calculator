@@ -7,7 +7,7 @@
 
 ✨ Features
  • Converts SAE Correccted kWm to other Site location kWm.
- • Get live realtime site location data
+ • Get live realtime site location data.
  • Mobile-friendly and responsive design.
 
 🛠️ Built With
