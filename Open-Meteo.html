@@ -24,9 +24,11 @@
         }
         html, body {
             width: 100%;
-            overflow-x: hidden;
+            height: 100%;
+            overflow: hidden; /* COMPLETELY DISABLES SCREEN SCROLLING */
             margin: 0;
             padding: 0;
+            position: fixed; /* Pin the background to prevent drag-scrolling glitches */
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
@@ -35,7 +37,7 @@
             padding: 12px;
             display: flex;
             justify-content: center;
-            align-items: flex-start;
+            align-items: center; /* Centered perfectly on your phone screen */
             min-height: 100vh;
             box-sizing: border-box;
         }
@@ -45,15 +47,15 @@
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); 
             width: 100%;
             max-width: 480px; 
-            padding: 16px;
+            padding: 10px; /* Reduced from 16px to shrink card height */
             box-sizing: border-box;
-            margin: 10px auto 0 auto;
+            margin: 5px auto 0 auto;
             border: 1px solid var(--thin-line-color);
         }
         .header {
             text-align: center;
             padding-bottom: 2px;
-            margin-bottom: 20px;
+            margin-bottom: 10px; /* Squeezed vertical space */
         }
         .header h1 {
             font-size: 20px;
@@ -71,8 +73,8 @@
             letter-spacing: 0.5px;
         }
         .input-group {
-            margin-bottom: 12px;
-            padding: 14px;
+            margin-bottom: 8px; /* Squeezed down from 12px */
+            padding: 8px 10px;  /* Squeezed vertically from 14px */
             border-radius: 8px;
             border: 1px solid var(--thin-line-color);
             text-align: center;
@@ -82,11 +84,11 @@
         .group-output { background-color: var(--pastel-yellow); }
         .group-search {
             background-color: #ffffff;
-            margin-bottom: 15px;
-            padding: 12px 10px;
+            margin-bottom: 10px; /* Squeezed from 15px */
+            padding: 8px 6px;    /* Tighter internal room */
             display: flex;
             flex-direction: column;
-            gap: 6px;
+            gap: 4px;            /* Brought row and status text closer */
             align-items: center;
         }
         .search-row {
@@ -97,26 +99,26 @@
             align-items: center;
         }
         .search-field {
-            width: 120px;
-            padding: 10px;
+            width: 90px; /* Reduced from 120px to give the toggle and button more width space */
+            padding: 10px 4px;
             border: 1px solid var(--border-color);
             border-radius: 6px;
-            font-size: 16px;
+            font-size: 15px;
             font-weight: bold;
             text-align: center;
             box-sizing: border-box;
         }
         .environmental-wrapper {
             background-color: var(--environmental-bg);
-            padding: 12px;
+            padding: 8px; /* Squeezed from 12px */
             border-radius: 10px;
             border: 1px solid var(--thin-line-color);
-            margin-bottom: 15px;
+            margin-bottom: 5px;
             box-sizing: border-box;
         }
         .nested-group {
-            margin-bottom: 10px;
-            padding: 10px;
+            margin-bottom: 6px; /* Squeezed down from 10px */
+            padding: 6px;       /* Squeezed down from 10px */
             border-radius: 6px;
             border: 1px solid var(--thin-line-color);
             text-align: center;
@@ -128,10 +130,10 @@
         .input-group label, .nested-group label {
             display: block;
             text-align: center;
-            font-size: 16px;
+            font-size: 14px; /* Slightly smaller text to prevent layout wrapping */
             font-weight: 800;
             color: #000000;
-            margin-bottom: 8px;
+            margin-bottom: 4px; /* Dropped from 8px */
         }
         .input-field {
             width: 100%;
@@ -171,9 +173,9 @@
         .btn-weather {
             background-color: var(--primary-blue);
             color: black;
-            padding: 10px 14px;
+            padding: 10px 8px; /* Narrower internal room for small mobile screens */
             border: 1px solid var(--border-color);
-            font-size: 13px;
+            font-size: 11px; /* Dropped from 13px so text stays locked inside boundaries */
             white-space: nowrap;
         }
         .btn-reset {
@@ -202,8 +204,6 @@
             font-weight: 800;
             color: #000000;
         }
-        
-        /* Phone-style Blue Toggle Slider Switch Styles */
         .toggle-container {
             display: flex;
             flex-direction: column;
@@ -263,6 +263,7 @@
             margin-top: 1px;
             text-align: center;
         }
+
     </style>
 </head>
 <body>
