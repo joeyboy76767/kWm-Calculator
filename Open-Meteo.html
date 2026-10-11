@@ -313,7 +313,7 @@
         </div>
         <div class="nested-group group-temp">
             <label for="temp">Temperature <span id="tempVal">70°F</span></label>
-            <input type="range" id="temp" class="slider-field" min="0" max="110" value="70" step="1">
+            <input type="range" id="temp" class="slider-field" min="-40" max="110" value="70" step="1">
         </div>
         <div class="button-container">
             <button class="btn btn-sae" onclick="setSAECorrected()">SAE Corrected</button>
@@ -342,15 +342,38 @@
 
     tempSlider.addEventListener('input', (e) => {
         tempVal.textContent = e.target.value + '°F';
+        weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
+    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
+    if (baroToggle.checked) {
+        baroToggle.checked = false;
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000";
+        if (phoneBarometerSensor) {
+            phoneBarometerSensor.stop();
+            phoneBarometerSensor = null;
+        }
+    }
         calculateMath();
     });
     humiditySlider.addEventListener('input', (e) => {
         humidityVal.textContent = e.target.value + '%';
+        weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
+    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
+    if (baroToggle.checked) {
+        baroToggle.checked = false;
+        liveBaroText.textContent = "Manual";
+        liveBaroText.style.color = "#000000";
+        if (phoneBarometerSensor) {
+            phoneBarometerSensor.stop();
+            phoneBarometerSensor = null;
+        }
+    }
         calculateMath();
     });
     altitudeSlider.addEventListener('input', (e) => {
         altitudeVal.textContent = parseInt(e.target.value).toLocaleString() + ' ft';
         // Turning the slider manually switches off the live barometer link
+            weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
         if (baroToggle.checked) {
             baroToggle.checked = false;
             liveBaroText.textContent = "Manual";
@@ -419,30 +442,31 @@ async function toggleBarometerMode() {
                         altitudeSlider.value = elevationFeet;
                         altitudeVal.textContent = elevationFeet.toLocaleString() + ' ft';
                         
-                        weatherStatus.textContent = "Live Site Tracking Active";
-                        weatherStatus.style.color = "#28a745";
+                        weatherStatus.textContent = "Live Site Active";
+                        weatherStatus.style.color = "var(--primary-red)";
                         liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
                         calculateMath();
                     }
                 } catch (error) {
                     weatherStatus.textContent = "GPS Weather network error.";
-                    weatherStatus.style.color = "#primary-red";
+                    weatherStatus.style.color = "var(--primary-red)";
                 }
             }, (error) => {
                 weatherStatus.textContent = "GPS access denied or unavailable.";
-                weatherStatus.style.color = "#primary-red";
+                weatherStatus.style.color = "var(--primary-red)";
                 liveBaroText.textContent = "Manual";
                 baroToggle.checked = false;
             });
         } else {
             weatherStatus.textContent = "Device does not support GPS.";
-            weatherStatus.style.color = "#primary-red";
+            weatherStatus.style.color = "var(--primary-red)";
             baroToggle.checked = false;
         }
     } else {
         // Turning the toggle OFF safely disconnects everything
         liveBaroText.textContent = "Manual";
         liveBaroText.style.color = "#000000";
+        weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
         if (phoneBarometerSensor) {
             phoneBarometerSensor.stop();
             phoneBarometerSensor = null;
@@ -575,7 +599,8 @@ async function toggleBarometerMode() {
         altitudeSlider.value = 1447;
         altitudeVal.textContent = '1,463 ft';
         zipInput.value = "54487";
-        weatherStatus.textContent = "Loaded! Tomahawk, Wisconsin";
+        weatherStatus.textContent = "Zenith PP Indoor Site";
+        weatherStatus.style.color = "#000000"; // Forces it back to BLACK
         calculateMath();
     }
 
@@ -591,6 +616,8 @@ async function toggleBarometerMode() {
         humidityVal.textContent = '0%';
         altitudeSlider.value = 0;
         altitudeVal.textContent = '0 ft';
+        weatherStatus.textContent = "SAE Corrected";
+        weatherStatus.style.color = "#000000"; // Forces it back to BLACK
         calculateMath();
     }
     
