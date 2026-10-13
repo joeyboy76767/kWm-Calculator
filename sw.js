@@ -1,25 +1,23 @@
-const CACHE_NAME = 'sae-calc-v1';
-const ASSETS = [
-  '',
-  'Open-Meteo.html',
-  'manifest.json',
-  'app-icon.png'
-];
-
-// Installs the service worker and caches your project files for offline use
+// This service worker satisfies the install criteria but completely disables caching
 self.addEventListener('install', (event) => {
+  self.skipWaiting(); 
+});
+
+// EVERY TIME THE APP OPENS: This completely vaporizes all old caches and data folders
+self.addEventListener('activate', (event) => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then((cache) => {
-      return cache.addAll(ASSETS);
+    caches.keys().then((cacheNames) => {
+      return Promise.all(
+        cacheNames.map((cache) => {
+          console.log('Vaporizing old data and cache:', cache);
+          return caches.delete(cache); 
+        })
+      );
     })
   );
 });
 
-// Controls network requests so the app launches instantly without internet
+// Always forces both the PWA and APK to stream live from your GitHub URL
 self.addEventListener('fetch', (event) => {
-  event.respondWith(
-    caches.match(event.request).then((cachedResponse) => {
-      return cachedResponse || fetch(event.request);
-    })
-  );
+  event.respondWith(fetch(event.request)); 
 });
