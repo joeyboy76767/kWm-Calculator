@@ -3,7 +3,7 @@ self.addEventListener('install', (event) => {
   self.skipWaiting(); 
 });
 
-// EVERY TIME THE APP OPENS: This completely vaporizes all old caches and data folders
+// EVERY TIME THE APP OPENS: Vaporizes old cache and takes control immediately
 self.addEventListener('activate', (event) => {
   event.waitUntil(
     caches.keys().then((cacheNames) => {
@@ -13,7 +13,7 @@ self.addEventListener('activate', (event) => {
           return caches.delete(cache); 
         })
       );
-    })
+    }).then(() => self.clients.claim()) // <--- TAKES IMMEDIATE CONTROL
   );
 });
 
