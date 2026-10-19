@@ -344,12 +344,13 @@
     tempSlider.addEventListener('input', (e) => {
         tempVal.textContent = e.target.value + '°F';
         weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
-    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
-    if (baroToggle.checked) {
-        baroToggle.checked = false;
+        liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
         liveBaroText.textContent = "Manual";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
+    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
+    if (baroToggle.checked) {
+        baroToggle.checked = false;
         if (phoneBarometerSensor) {
             phoneBarometerSensor.stop();
             phoneBarometerSensor = null;
@@ -360,12 +361,13 @@
     humiditySlider.addEventListener('input', (e) => {
         humidityVal.textContent = e.target.value + '%';
         weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
-    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
-    if (baroToggle.checked) {
-        baroToggle.checked = false;
+        liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
         liveBaroText.textContent = "Manual";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
+    // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
+    if (baroToggle.checked) {
+        baroToggle.checked = false;
         if (phoneBarometerSensor) {
             phoneBarometerSensor.stop();
             phoneBarometerSensor = null;
