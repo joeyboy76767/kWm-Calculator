@@ -213,8 +213,8 @@
             flex-direction: column;
             align-items: center;
             gap: 2px;
-            margin-left: -50px; /* Pulls just the toggle unit to the left */
-            margin-right: 50px; /* Prevents the zip field from moving with it */
+            margin-left: -20px; /* Pulls just the toggle unit to the left */
+            margin-right: 20px; /* Prevents the zip field from moving with it */
             transform: translateY(10px);
     }
         .toggle-label {
@@ -320,7 +320,7 @@
         </div>
         <div class="button-container">
             <button class="btn btn-sae" onclick="setSAECorrected()">SAE Corrected</button>
-            <button class="btn btn-reset" onclick="resetForm()">Zenith Indoor Site</button>
+            <button class="btn btn-reset" onclick="resetForm()">Zenith Plant</button>
         </div>
     </div>
 </div>
@@ -423,7 +423,7 @@ async function toggleBarometerMode() {
             navigator.geolocation.getCurrentPosition(async (position) => {
                 const lat = position.coords.latitude;
                 const lon = position.coords.longitude;
-                weatherStatus.textContent = "GPS Locked Fetching data...";
+                weatherStatus.textContent = "GPS Signal OK";
                 weatherStatus.style.color = "#0056b3";
                 try {
                     // Pulls true temperature, humidity, and elevation for your exact GPS spot
@@ -450,11 +450,11 @@ async function toggleBarometerMode() {
                         calculateMath();
                     }
                 } catch (error) {
-                    weatherStatus.textContent = "GPS Weather network error.";
+                    weatherStatus.textContent = "GPS Weather Network Error";
                     weatherStatus.style.color = "var(--primary-red)";
                 }
             }, (error) => {
-                weatherStatus.textContent = "GPS access denied or unavailable.";
+                weatherStatus.textContent = "GPS Denied";
                 weatherStatus.style.color = "var(--primary-red)";
                 liveBaroText.textContent = "Manual";
                 liveBaroText.style.color = "#000000";
@@ -462,7 +462,7 @@ async function toggleBarometerMode() {
                 document.querySelector('.toggle-label').style.color = "#000000";
             });
         } else {
-            weatherStatus.textContent = "Device does not support GPS.";
+            weatherStatus.textContent = "GPS Not Supported";
             weatherStatus.style.color = "var(--primary-red)";
             baroToggle.checked = false;
             document.querySelector('.toggle-label').style.color = "#000000";
@@ -494,11 +494,11 @@ async function toggleBarometerMode() {
     }
         const zip = zipInput.value.trim();
         if (!zip || zip.length !== 5 || isNaN(zip)) {
-            weatherStatus.textContent = "Enter a valid 5-digit ZIP code.";
+            weatherStatus.textContent = "Enter 5-digit ZIP Code";
             weatherStatus.style.color = "#dc3545";
             return;
         }
-        weatherStatus.textContent = "Connecting to network...";
+        weatherStatus.textContent = "Connecting To Network";
         weatherStatus.style.color = "#0056b3";
         try {
             // [PLACE LINK ONE HERE - Geocoding API Request]
@@ -506,19 +506,19 @@ async function toggleBarometerMode() {
             const geoResponse = await fetch("https://geocoding-api.open-meteo.com/v1/search?name=" + zip + "&count=1&countryCode=US&language=en&format=json");
             const geoData = await geoResponse.json();
             if (!geoData.results || geoData.results.length === 0) {
-                weatherStatus.textContent = "ZIP code not found.";
+                weatherStatus.textContent = "ZIP Code Not Found";
                 weatherStatus.style.color = "#dc3545";
                 return;
             }            const location = geoData.results[0]; 
             const lat = location.latitude;
             const lon = location.longitude;
             const elevationFeet = Math.round((location.elevation || 0) * 3.28084);
-            weatherStatus.textContent = "Fetching weather data...";
+            weatherStatus.textContent = "Fetching Weather Data";
             // [PLACE LINK TWO HERE - Weather Forecast API Request]
             const weatherResponse = await fetch("https://api.open-meteo.com/v1/forecast?latitude=" + lat + "&longitude=" + lon + "&current=temperature_2m,relative_humidity_2m,surface_pressure&temperature_unit=fahrenheit&timezone=auto");
             const weatherData = await weatherResponse.json();
             if (!weatherData.current || !weatherData.current.surface_pressure) {
-                weatherStatus.textContent = "Server data error.";
+                weatherStatus.textContent = "Server Data Error";
                 weatherStatus.style.color = "#dc3545";
                 return;
             }
@@ -547,7 +547,7 @@ async function toggleBarometerMode() {
             weatherStatus.style.color = "#28a745";
         } catch (error) {
             console.error("API Connection Error:", error);
-            weatherStatus.textContent = "Network error. Check connection.";
+            weatherStatus.textContent = "Network Error Check Connection";
             weatherStatus.style.color = "#dc3545";
         }
     }
@@ -617,7 +617,7 @@ function formatStateInitials(stateName) {
         altitudeSlider.value = 1465;
         altitudeVal.textContent = '1,465 ft';
         zipInput.value = "54487";
-        weatherStatus.textContent = "28.37 inHg - Zenith Indoor Site";
+        weatherStatus.textContent = "Zenith Plant 28.37 inHg";
         weatherStatus.style.color = "#000000"; // Forces it back to BLACK
         document.querySelector('.toggle-label').style.color = "#000000";
         calculateMath();
@@ -634,7 +634,7 @@ function formatStateInitials(stateName) {
         humidityVal.textContent = '0%';
         altitudeSlider.value = 0;
         altitudeVal.textContent = '0 ft';
-        weatherStatus.textContent = "29.23 inHg - SAE Corrected";
+        weatherStatus.textContent = "SAE Corrected 29.23 inHg";
         weatherStatus.style.color = "#000000"; // Forces it back to BLACK
         document.querySelector('.toggle-label').style.color = "#000000";
         calculateMath();
