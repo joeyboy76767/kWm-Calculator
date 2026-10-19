@@ -289,7 +289,7 @@
                     <input type="checkbox" id="baroToggle" onchange="toggleBarometerMode()">
                     <span class="toggle-slider"></span>
                 </label>
-                <div id="liveBaroText" class="live-baro-display">Manual</div>
+                <div id="liveBaroText" class="live-baro-display">Off</div>
             </div>
             <input type="input" pattern="[0-9]*" inputmode="numeric" id="zipInput" class="search-field" maxlength="5" placeholder="ZIP Code">
             <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">Current ZIP</button>
@@ -345,7 +345,7 @@
         tempVal.textContent = e.target.value + '°F';
         weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
         liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
     // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
@@ -362,7 +362,7 @@
         humidityVal.textContent = e.target.value + '%';
         weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
         liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
     // INSANE FIX: Automatically turn off Live Site if temperature is manually changed
@@ -380,7 +380,7 @@
         // Turning the slider manually switches off the live barometer link
             weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
             liveStationPressureInHg = null; // Clears the website pressure so slider math takes over
-            liveBaroText.textContent = "Manual";
+            liveBaroText.textContent = "Off";
             liveBaroText.style.color = "#000000"; // Forces it back to BLACK when dragged
             document.querySelector('.toggle-label').style.color = "#000000";
         if (baroToggle.checked) {
@@ -444,9 +444,9 @@ async function toggleBarometerMode() {
                         const elevationFeet = Math.round((weatherData.elevation || 0) * 3.28084);
                         altitudeSlider.value = elevationFeet;
                         altitudeVal.textContent = elevationFeet.toLocaleString() + ' ft';
-                        weatherStatus.textContent = "Live Site Active";
+                        weatherStatus.textContent = "Live Site " + liveStationPressureInHg.toFixed(2) + " inHg";
                         weatherStatus.style.color = "var(--primary-red)";
-                        liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                        liveBaroText.textContent = "Active";
                         liveBaroText.style.color = "#dc3545";
                         document.querySelector('.toggle-label').style.color = "#dc3545";
                         calculateMath();
@@ -458,7 +458,7 @@ async function toggleBarometerMode() {
             }, (error) => {
                 weatherStatus.textContent = "GPS Denied";
                 weatherStatus.style.color = "var(--primary-red)";
-                liveBaroText.textContent = "Manual";
+                liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000";
                 baroToggle.checked = false;
                 document.querySelector('.toggle-label').style.color = "#000000";
@@ -471,7 +471,7 @@ async function toggleBarometerMode() {
         }
     } else {
         // Turning the toggle OFF safely disconnects everything
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
         weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
@@ -486,7 +486,7 @@ async function toggleBarometerMode() {
     // Disconnect and turn off all live GPS / Hardware sensor links immediately
     if (baroToggle.checked) {
         baroToggle.checked = false;
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000";
         document.querySelector('.toggle-label').style.color = "#000000";
         if (phoneBarometerSensor) {
@@ -535,7 +535,7 @@ async function toggleBarometerMode() {
             tempSlider.value = liveTemp;
             tempVal.textContent = liveTemp + '°F';
             // Automatically turn on and display the live barometer lock when ZIP data populates
-            liveBaroText.style.color = "#000000"; // Forces the "Manual" text to stay black
+            liveBaroText.style.color = "#000000"; // Forces the "Off" text to stay black
             calculateMath();
             const stateCode = formatStateInitials(location.admin1 || location.country);
         let cityState = location.name;
@@ -610,7 +610,7 @@ function formatStateInitials(stateName) {
         // Zeroes out the active features and restores your default shop conditions exactly as before
         liveStationPressureInHg = null;
         baroToggle.checked = false;
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000"; // Forces it back to BLACK
         tempSlider.value = 70;
         tempVal.textContent = '70°F';
@@ -628,7 +628,7 @@ function formatStateInitials(stateName) {
         // Zeroes out the overrides and forces perfect standard atmospheric properties
         liveStationPressureInHg = 29.23;
         baroToggle.checked = false;
-        liveBaroText.textContent = "Manual";
+        liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000"; // Forces it back to BLACK
         tempSlider.value = 77;
         tempVal.textContent = '77°F';
