@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Outdoor Site kWm SAE Correction Calculator</title>
+    <title>Outdoor Site SAE Power Correction Calculator</title>
     <link rel="manifest" href="manifest.json">
     <link rel="icon" type="image/png" href="app-icon.png">
     <style>
@@ -297,8 +297,8 @@
 <body>
 <div class="calculator-card">
     <div class="header">
-        <h1 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0 0 2px 0; padding: 0;">Outdoor Site kWm</h1>
-        <h2 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0; padding: 0;">SAE Correction Calculator</h2>
+        <h1 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0 0 2px 0; padding: 0;">Outdoor Site SAE</h1>
+        <h2 style="font-size: 20px; font-weight: 800; color: #000000; margin: 0; padding: 0;">Power Correction Calculator</h2>
     </div>
     <div class="input-group group-search">
         <div class="search-row">
@@ -674,6 +674,17 @@ function formatStateInitials(stateName) {
         document.querySelector('.toggle-label').style.color = "#000000";
         calculateMath();
     }    
+// Force desktop window to stay at phone size
+try {
+    if (window.outerWidth > 600) {
+        window.resizeTo(490, 850);
+    }
+} catch (e) {
+    console.log("Window resize ignored by browser");
+}
+// Initial run on script execution
+setSAECorrected();
+
 // Initial run on script execution
     setSAECorrected(); // or resetForm() if you prefer it to open on Zenith Indoor conditions
 // Register the service worker to allow home screen phone installation
