@@ -81,7 +81,26 @@
             box-sizing: border-box;
         }
         .group-input { background-color: var(--pastel-brown); }
-        .group-output { background-color: var(--pastel-yellow); }
+        
+        /* Side-by-side Dual Output Row */
+        .output-row {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 8px;
+            width: 100%;
+            box-sizing: border-box;
+        }
+        .output-box {
+            flex: 1;
+            padding: 8px 6px;
+            border-radius: 8px;
+            border: 1px solid var(--thin-line-color);
+            text-align: center;
+            box-sizing: border-box;
+        }
+        .box-kwm { background-color: var(--pastel-yellow); }
+        .box-hp { background-color: var(--pastel-red); }
+
         .group-search {
             background-color: #ffffff;
             margin-bottom: 10px; /* Squeezed from 15px */
@@ -130,7 +149,7 @@
         .group-altitude { background-color: var(--pastel-blue); }
         .group-humidity { background-color: var(--pastel-green); }
         .group-temp { background-color: var(--pastel-red); margin-bottom: 12px; }
-        .input-group label, .nested-group label {
+        .input-group label, .nested-group label, .output-box label {
             display: block;
             text-align: center;
             font-size: 16px; /* Slightly smaller text to prevent layout wrapping */
@@ -204,9 +223,10 @@
             transform: translate(35px, -14px);
         }
         .value {
-            font-size: 22px;
+            font-size: 20px; /* Sized to fit two boxes comfortably side-by-side */
             font-weight: 800;
             color: #000000;
+            white-space: nowrap;
         }
         .toggle-container {
             display: flex;
@@ -216,7 +236,7 @@
             margin-left: -20px; /* Pulls just the toggle unit to the left */
             margin-right: 20px; /* Prevents the zip field from moving with it */
             transform: translateY(10px);
-    }
+        }
         .toggle-label {
             font-size: 15px;
             font-weight: 800;
@@ -300,10 +320,19 @@
         <label for="baseKwm">kWm SAE Corrected</label>
         <input type="number" id="baseKwm" class="input-field" value="0" placeholder="0">
     </div>
-    <div class="input-group group-output">
-        <label>kWm Site</label>
-        <div id="outputKwm" class="value" style="margin-top: 4px;">0.00 kWm</div>
+
+    <!-- Side-by-Side Dual Output Gauges -->
+    <div class="output-row">
+        <div class="output-box box-kwm">
+            <label>kWm Site</label>
+            <div id="outputKwm" class="value" style="margin-top: 4px;">0.00 kWm</div>
+        </div>
+        <div class="output-box box-hp">
+            <label>HP Site</label>
+            <div id="outputHp" class="value" style="margin-top: 4px;">0.00 HP</div>
+        </div>
     </div>
+
     <div class="environmental-wrapper">
         <div class="section-title">Environmental Variables</div>
         <div class="nested-group group-altitude">
@@ -333,6 +362,7 @@
     const altitudeVal = document.getElementById('altitudeVal');
     const baseKwmInput = document.getElementById('baseKwm');
     const outputKwm = document.getElementById('outputKwm');
+    const outputHp = document.getElementById('outputHp');
     const zipInput = document.getElementById('zipInput');
     const weatherStatus = document.getElementById('weatherStatus');
     const baroToggle = document.getElementById('baroToggle');
@@ -583,10 +613,13 @@ async function toggleBarometerMode() {
         const tempRatio = Math.sqrt(currentTempKelvin / standardTempKelvin);
         const saeCorrectionFactor = (1.18 * (pressureRatio * tempRatio)) - 0.18;
         let finalKwm = 0;
+        let finalHp = 0;
         if (saeCorrectionFactor > 0) {
             finalKwm = kwm / saeCorrectionFactor;
+            finalHp = finalKwm * 1.34102209; // 8 decimal point SAE Mechanical Horsepower conversion
         }        
         outputKwm.textContent = finalKwm.toFixed(2) + ' kWm';
+        outputHp.textContent = finalHp.toFixed(2) + ' HP';
     }
 function formatStateInitials(stateName) {
     if (!stateName) return '';
