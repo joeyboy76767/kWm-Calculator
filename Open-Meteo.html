@@ -674,14 +674,6 @@ function formatStateInitials(stateName) {
         document.querySelector('.toggle-label').style.color = "#000000";
         calculateMath();
     }    
-// Force desktop window to stay at phone size
-try {
-    if (window.outerWidth > 600) {
-        window.resizeTo(490, 850);
-    }
-} catch (e) {
-    console.log("Window resize ignored by browser");
-}
 // Initial run on script execution
 setSAECorrected();
 
