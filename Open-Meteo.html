@@ -519,7 +519,7 @@
                     inputCard.classList.add("hp-mode");
                     inputMainLabel.textContent = "HP SAE Corrected";
                     inputSuffix.textContent = "HP";
-                    baseKwmInput.max = "13410";
+                    baseKwmInput.max = "13410.22";
 
                     // Convert existing number from kWm to HP
                     if (hasValue) {
@@ -593,7 +593,7 @@
                 }
             });
             baseKwmInput.addEventListener("input", (e) => {
-                const maxVal = inputUnitMode === "HP" ? 13410 : 10000;
+                const maxVal = inputUnitMode === "HP" ? 13410.22 : 10000;
                 if (parseFloat(e.target.value) > maxVal) {
                     e.target.value = maxVal.toString();
                 }
