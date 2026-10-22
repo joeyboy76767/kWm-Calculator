@@ -90,8 +90,7 @@
             .group-input.hp-mode {
                 background-color: var(--pastel-red-input);
             }
-
-            /* Container for left toggle pill and input */
+            /* Balances space for the left pill toggle AND right turbo toggle */
             .input-layout-row {
                 position: relative;
                 width: 100%;
@@ -99,10 +98,33 @@
                 flex-direction: column;
                 align-items: center;
                 justify-content: center;
-                padding-left: 60px; /* Reserves clear room for the pill toggle */
+                padding-left: 64px; /* Space for [kWm | HP] */
+                padding-right: 54px; /* Space for Turbo */
                 box-sizing: border-box;
             }
-
+            /* Turbo Toggle on the right side */
+            .turbo-container {
+                position: absolute;
+                right: 4px;                
+                top: 50%;
+                transform: translateY(-50%);
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                gap: 1px;
+                z-index: 2;
+            }
+            .turbo-label {
+                font-size: 13px;
+                font-weight: 800;
+                color: #000000;
+            }
+            .turbo-status {
+                font-size: 13px;                
+                font-weight: 800;
+                color: #000000;
+                margin-top: 1px;
+            }
             /* Either-Or Pill Capsule Toggle */
             .unit-toggle-pill {                
                 position: absolute;                
@@ -431,22 +453,31 @@
                 </div>
                 <div id="weatherStatus" class="status-text"></div>
             </div>
-
-            <!-- Single Input Box with Left-Hand Either-Or Pill Toggle -->
+            <!-- Single Input Box with Left Pill Toggle and Right Turbo Toggle -->
             <div class="input-group group-input" id="inputCard">
                 <div class="input-layout-row">
+                    <!-- Far Left: Unit Pill -->
                     <div class="unit-toggle-pill">
                         <button type="button" class="pill-btn active" id="btnKwm" onclick="setInputUnit('kWm')">kWm</button>
                         <button type="button" class="pill-btn" id="btnHp" onclick="setInputUnit('HP')">HP</button>
                     </div>
+                    <!-- Center: Input & Label -->
                     <label for="baseKwm" id="inputMainLabel">kWm SAE Corrected</label>
                     <div class="input-wrapper-kwm">
                         <input type="number" id="baseKwm" min="0" max="10000" step="0.01" placeholder="0.00" autofocus />
                         <span class="kwm-inside-label" id="inputSuffix">kWm</span>
                     </div>
+                    <!-- Far Right: Turbo Toggle -->
+                    <div class="turbo-container">
+                        <span class="turbo-label">Turbo</span>
+                        <label class="switch">
+                            <input type="checkbox" id="turboToggle" onchange="toggleTurboMode()" />
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div id="turboStatusText" class="turbo-status">Off</div>
+                    </div>
                 </div>
             </div>
-
             <!-- Side-by-Side Dual Output Gauges -->
             <div class="output-row">
                 <div class="output-box box-kwm">
@@ -492,7 +523,6 @@
             const weatherStatus = document.getElementById("weatherStatus");
             const baroToggle = document.getElementById("baroToggle");
             const liveBaroText = document.getElementById("liveBaroText");
-
             // Input Unit Toggle Elements
             const inputCard = document.getElementById("inputCard");
             const inputMainLabel = document.getElementById("inputMainLabel");
@@ -500,19 +530,18 @@
             const btnKwm = document.getElementById("btnKwm");
             const btnHp = document.getElementById("btnHp");
             let inputUnitMode = "kWm"; // Tracks 'kWm' or 'HP'
-
+            // Turbo Toggle Elements
+            const turboToggle = document.getElementById("turboToggle");
+            const turboStatusText = document.getElementById("turboStatusText");
             // Global variable for the hardware chip
             let phoneBarometerSensor = null;
             // Keeps track of the true localized barometric pressure from the weather API
             let liveStationPressureInHg = null;
-
             function setInputUnit(unit) {
                 if (inputUnitMode === unit) return;
                 inputUnitMode = unit;
-
                 let currentVal = parseFloat(baseKwmInput.value);
                 const hasValue = !isNaN(currentVal) && currentVal > 0;
-
                 if (unit === "HP") {
                     btnKwm.classList.remove("active");
                     btnHp.classList.add("active");
@@ -520,7 +549,6 @@
                     inputMainLabel.textContent = "HP SAE Corrected";
                     inputSuffix.textContent = "HP";
                     baseKwmInput.max = "13410.22";
-
                     // Convert existing number from kWm to HP
                     if (hasValue) {
                         baseKwmInput.value = (currentVal * 1.34102209).toFixed(2);
@@ -532,7 +560,6 @@
                     inputMainLabel.textContent = "kWm SAE Corrected";
                     inputSuffix.textContent = "kWm";
                     baseKwmInput.max = "10000";
-
                     // Convert existing number from HP to kWm
                     if (hasValue) {
                         baseKwmInput.value = (currentVal / 1.34102209).toFixed(2);
@@ -541,7 +568,16 @@
                 calculateMath();
                 baseKwmInput.focus();
             }
-
+            function toggleTurboMode() {
+                if (turboToggle.checked) {
+                    turboStatusText.textContent = "On";
+                    turboStatusText.style.color = "#0056b3";
+                } else {
+                    turboStatusText.textContent = "Off";
+                    turboStatusText.style.color = "#000000";
+                }
+                calculateMath();
+            }
             tempSlider.addEventListener("input", (e) => {
                 tempVal.textContent = e.target.value + " °F";
                 weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
@@ -597,7 +633,6 @@
                 if (parseFloat(e.target.value) > maxVal) {
                     e.target.value = maxVal.toString();
                 }
-
                 // Lock to 2 decimal places max
                 if (e.target.value.includes(".")) {
                     const parts = e.target.value.split(".");
@@ -785,10 +820,8 @@
             function calculateMath() {
                 let rawInputValue = parseFloat(baseKwmInput.value);
                 const rawVal = isNaN(rawInputValue) ? 0 : rawInputValue;
-
                 // If in HP Mode, convert to kWm internally so the core SAE formula remains standard
                 const kwm = inputUnitMode === "HP" ? rawVal / 1.34102209 : rawVal;
-
                 const temp = parseInt(tempSlider.value);
                 const humidity = parseInt(humiditySlider.value);
                 const altitude = parseInt(altitudeSlider.value);
@@ -797,7 +830,10 @@
                 const standardSeaLevel = 29.92; // True Earth atmospheric pressure at sea level
                 const standardTempKelvin = 298.15; // 77 °F
                 let baroPressure;
-                if (liveStationPressureInHg !== null) {
+                if (turboToggle.checked) {
+                    // Turbo maintains manifold boost, bypassing altitude loss
+                    baroPressure = saeTargetPressure; // 29.23 inHg baseline
+                } else if (liveStationPressureInHg !== null) {
                     baroPressure = liveStationPressureInHg;
                 } else {
                     baroPressure = standardSeaLevel * Math.pow(1 - 0.0000068756 * altitude, 5.25588);
