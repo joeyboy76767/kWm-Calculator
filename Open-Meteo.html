@@ -429,30 +429,6 @@
                     Power Correction Calculator
                 </h2>
             </div>
-            <div class="input-group group-search">
-                <div class="search-row">
-                    <!-- New Site Baro Toggle and Measurement Display Box -->
-                    <div class="toggle-container">
-                        <span class="toggle-label">Live Site</span>
-                        <label class="switch">
-                            <input type="checkbox" id="baroToggle" onchange="toggleBarometerMode()" />
-                            <span class="toggle-slider"></span>
-                        </label>
-                        <div id="liveBaroText" class="live-baro-display">Off</div>
-                    </div>
-                    <input
-                        type="text"
-                        pattern="[0-9]*"
-                        inputmode="numeric"
-                        id="zipInput"
-                        class="search-field"
-                        maxlength="5"
-                        placeholder="ZIP Code"
-                    />
-                    <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">Current ZIP</button>
-                </div>
-                <div id="weatherStatus" class="status-text"></div>
-            </div>
             <!-- Single Input Box with Left Pill Toggle and Right Turbo Toggle -->
             <div class="input-group group-input" id="inputCard">
                 <div class="input-layout-row">
@@ -488,6 +464,30 @@
                     <label>HP Site</label>
                     <div id="outputHp" class="value" style="margin-top: 4px">0.00 HP</div>
                 </div>
+            </div>
+            <div class="input-group group-search">
+                <div class="search-row">
+                    <!-- New Site Baro Toggle and Measurement Display Box -->
+                    <div class="toggle-container">
+                        <span class="toggle-label">Live Site</span>
+                        <label class="switch">
+                            <input type="checkbox" id="baroToggle" onchange="toggleBarometerMode()" />
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <div id="liveBaroText" class="live-baro-display">Off</div>
+                    </div>
+                    <input
+                        type="text"
+                        pattern="[0-9]*"
+                        inputmode="numeric"
+                        id="zipInput"
+                        class="search-field"
+                        maxlength="5"
+                        placeholder="ZIP Code"
+                    />
+                    <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">Current ZIP</button>
+                </div>
+                <div id="weatherStatus" class="status-text"></div>
             </div>
             <div class="environmental-wrapper">
                 <div class="section-title">Environmental Variables</div>
