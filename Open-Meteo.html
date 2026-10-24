@@ -179,7 +179,6 @@
             .box-hp {
                 background-color: var(--pastel-red);
             }
-
             .group-search {
                 background-color: #ffffff;
                 margin-bottom: 10px; /* Squeezed from 15px */
@@ -267,7 +266,6 @@
             input[type="number"] {
                 -moz-appearance: textfield;
             }
-
             /* Container to put unit suffix inside the input box */
             .input-wrapper-kwm {
                 position: relative;
@@ -582,6 +580,7 @@
                 tempVal.textContent = e.target.value + " °F";
                 weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
                 liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
+                liveBaroText.style.visibility = "visible";
                 liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000";
                 document.querySelector(".toggle-label").style.color = "#000000";
@@ -598,6 +597,7 @@
                 humidityVal.textContent = e.target.value + " %";
                 weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
                 liveStationPressureInHg = null; // Clears locked pressure -> Clean Slate
+                liveBaroText.style.visibility = "visible";
                 liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000";
                 document.querySelector(".toggle-label").style.color = "#000000";
@@ -614,6 +614,7 @@
                 altitudeVal.textContent = parseInt(e.target.value).toLocaleString() + " Feet";
                 weatherStatus.textContent = ""; // <--- CLEAR TEXT HERE
                 liveStationPressureInHg = null; // Clears the website pressure so slider math takes over
+                liveBaroText.style.visibility = "visible";
                 liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000"; // Forces it back to BLACK when dragged
                 document.querySelector(".toggle-label").style.color = "#000000";
@@ -654,8 +655,7 @@
                 if (baroToggle.checked) {
                     liveStationPressureInHg = null; // WIPES ANY OLD ZIP PRESSURE CLEAN
                     zipInput.value = ""; // Clears the ZIP box so there is no confusion
-                    liveBaroText.textContent = "Locating...";
-                    liveBaroText.style.color = "#0056b3";
+                    liveBaroText.style.visibility = "hidden";
                     document.querySelector(".toggle-label").style.color = "#0056b3";
                     if ("AbsoluteOrientationSensor" in window || "Sensor" in window) {
                         try {
@@ -664,7 +664,7 @@
                                 phoneBarometerSensor.addEventListener("reading", () => {
                                     liveStationPressureInHg = phoneBarometerSensor.pressure * 0.02953;
                                     if (baroToggle.checked) {
-                                        liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                                        liveBaroText.style.visibility = "hidden";
                                         calculateMath();
                                     }
                                 });
@@ -679,7 +679,7 @@
                             async (position) => {
                                 const lat = position.coords.latitude;
                                 const lon = position.coords.longitude;
-                                weatherStatus.textContent = "GPS Signal OK";
+                                weatherStatus.textContent = "Locating";
                                 weatherStatus.style.color = "#0056b3";
                                 try {
                                     const weatherResponse = await fetch(
@@ -697,27 +697,60 @@
                                         humidityVal.textContent = humiditySlider.value + " %";
                                         if (liveStationPressureInHg === null && weatherData.current.surface_pressure) {
                                             liveStationPressureInHg = weatherData.current.surface_pressure * 0.02953;
-                                            liveBaroText.textContent = liveStationPressureInHg.toFixed(2) + " inHg";
+                                            liveBaroText.style.visibility = "hidden";
                                         }
                                         const elevationFeet = Math.round((weatherData.elevation || 0) * 3.28084);
                                         altitudeSlider.value = elevationFeet;
                                         altitudeVal.textContent = elevationFeet.toLocaleString() + " Feet";
-                                        weatherStatus.textContent =
-                                            "Live Site " + liveStationPressureInHg.toFixed(2) + " inHg";
+                                            var shortAddress = "Live Site";
+                                        try {
+                                            var geoUrl = "https://api.geoapify.com/v1/geocode/reverse?lat=" + lat + "&lon=" + lon + "&apiKey=b22152617da24696b96b1eaa29a0e689";
+                                            var geoRes = await fetch(geoUrl);
+                                            var geoData = await geoRes.json();
+                                        if (geoData.features && geoData.features[0] && geoData.features[0].properties) {
+                                            var p = geoData.features[0].properties;
+                                            var houseNumber = p.housenumber || "";
+                                            let street = p.street || "";
+                                            var locality = p.district || p.suburb || p.neighbourhood || p.city || p.town || p.village || p.municipality || p.county || "";
+                                            var stateCode = p.state_code || p.state || "";
+                                            street = formatStreetName(street);
+                                            let formattedLine = [houseNumber + " " + street, locality, stateCode]
+                                              .filter(Boolean)
+                                              .join(", ")
+                                              .replace(/City of |Town of |Village of | Inc\.| LLC|\s+/gi, " ")
+                                              .trim();
+                                            if (!formattedLine) {
+                                              formattedLine = lat.toFixed(4) + ", " + lon.toFixed(4) + " (Address Unmapped)";
+                                            }
+                                            shortAddress = formattedLine;
+                                        }
+                                        } catch (geoErr) {
+                                        console.log("Geoapify Error", geoErr);
+                                        }
+                                        weatherStatus.textContent = shortAddress + " " + liveStationPressureInHg.toFixed(2) + " inHg";
+                                        function formatStreetName(streetName) {
+                                          if (!streetName) return "";
+                                          return streetName
+                                            .replace(/^Northwest\b/i, "NW").replace(/^Northeast\b/i, "NE").replace(/^Southwest\b/i, "SW").replace(/^Southeast\b/i, "SE").replace(/^North\b/i, "N").replace(/^South\b/i, "S").replace(/^East\b/i, "E").replace(/^West\b/i, "W")
+                                            .replace(/\bCounty Road\b/gi, "Co Rd").replace(/\bCounty Highway\b/gi, "Co Hwy").replace(/\bState Highway\b/gi, "STH").replace(/\bSth\b/gi, "STH").replace(/\bUnited States Highway\b/gi, "US").replace(/\bUsh\b/gi, "US").replace(/\bFederal Highway\b/gi, "Fed Hwy").replace(/\bHighway\b/gi, "Hwy")
+                                            .replace(/\bRoad\b/gi, "Rd").replace(/\bStreet\b/gi, "St").replace(/\bAvenue\b/gi, "Ave").replace(/\bDrive\b/gi, "Dr").replace(/\bCourt\b/gi, "Ct").replace(/\bLane\b/gi, "Ln").replace(/\bWay\b/gi, "Way").replace(/\bCircle\b/gi, "Cir")
+                                            .replace(/\bBoulevard\b/gi, "Blvd").replace(/\bParkway\b/gi, "Pkwy").replace(/\bTrail\b/gi, "Trl").replace(/\bPlace\b/gi, "Pl").replace(/\bTerrace\b/gi, "Ter").replace(/\bExpressway\b/gi, "Expy").replace(/\bFreeway\b/gi, "Fwy");
+                                        }
                                         weatherStatus.style.color = "var(--primary-red)";
-                                        liveBaroText.textContent = "Active";
+                                        // liveBaroText.textContent = "Active";
                                         liveBaroText.style.color = "#dc3545";
                                         document.querySelector(".toggle-label").style.color = "#dc3545";
                                         calculateMath();
                                     }
                                 } catch (error) {
-                                    weatherStatus.textContent = "GPS Weather Network Error";
+                                    weatherStatus.textContent = "GPS Network Error";
                                     weatherStatus.style.color = "var(--primary-red)";
                                 }
                             },
                             (error) => {
                                 weatherStatus.textContent = "GPS Denied";
                                 weatherStatus.style.color = "var(--primary-red)";
+                                liveBaroText.style.visibility = "visible";
                                 liveBaroText.textContent = "Off";
                                 liveBaroText.style.color = "#000000";
                                 baroToggle.checked = false;
@@ -731,6 +764,7 @@
                         document.querySelector(".toggle-label").style.color = "#000000";
                     }
                 } else {
+                    liveBaroText.style.visibility = "visible";
                     liveBaroText.textContent = "Off";
                     liveBaroText.style.color = "#000000";
                     document.querySelector(".toggle-label").style.color = "#000000";
@@ -745,6 +779,7 @@
             async function fetchLiveWeatherByZip() {
                 if (baroToggle.checked) {
                     baroToggle.checked = false;
+                    liveBaroText.style.visibility = "visible";
                     liveBaroText.textContent = "Off";
                     liveBaroText.style.color = "#000000";
                     document.querySelector(".toggle-label").style.color = "#000000";
@@ -800,6 +835,7 @@
                     humidityVal.textContent = liveHumidity + " %";
                     tempSlider.value = liveTemp;
                     tempVal.textContent = liveTemp + " °F";
+                    liveBaroText.style.visibility = "visible";
                     liveBaroText.style.color = "#000000";
                     calculateMath();
                     const stateCode = formatStateInitials(location.admin1 || location.country);
@@ -809,7 +845,7 @@
                     } else if (stateCode) {
                         cityState += ", " + stateCode;
                     }
-                    weatherStatus.textContent = liveStationPressureInHg.toFixed(2) + " inHg - " + cityState;
+                    weatherStatus.textContent = cityState + " " + liveStationPressureInHg.toFixed(2) + " inHg";
                     weatherStatus.style.color = "#28a745";
                 } catch (error) {
                     console.error("API Connection Error:", error);
@@ -917,6 +953,7 @@
             function resetForm() {
                 liveStationPressureInHg = null;
                 baroToggle.checked = false;
+                liveBaroText.style.visibility = "visible";
                 liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000";
                 tempSlider.value = 70;
@@ -934,6 +971,7 @@
             function setSAECorrected() {
                 liveStationPressureInHg = 29.23;
                 baroToggle.checked = false;
+                liveBaroText.style.visibility = "visible";
                 liveBaroText.textContent = "Off";
                 liveBaroText.style.color = "#000000";
                 tempSlider.value = 77;
