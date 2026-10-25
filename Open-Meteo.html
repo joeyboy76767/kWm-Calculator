@@ -438,7 +438,7 @@
                     <!-- Center: Input & Label -->
                     <label for="baseKwm" id="inputMainLabel">kWm SAE Corrected</label>
                     <div class="input-wrapper-kwm">
-                        <input type="number" id="baseKwm" min="0" max="10000" step="0.01" placeholder="0.00" autofocus />
+                        <input type="text" id="baseKwm" inputmode="decimal" placeholder="0.00" autofocus />
                         <span class="kwm-inside-label" id="inputSuffix">kWm</span>
                     </div>
                     <!-- Far Right: Turbo Toggle -->
@@ -546,7 +546,6 @@
                     inputCard.classList.add("hp-mode");
                     inputMainLabel.textContent = "HP SAE Corrected";
                     inputSuffix.textContent = "HP";
-                    baseKwmInput.max = "13410.22";
                     // Convert existing number from kWm to HP
                     if (hasValue) {
                         baseKwmInput.value = (currentVal * 1.34102209).toFixed(2);
@@ -557,7 +556,6 @@
                     inputCard.classList.remove("hp-mode");
                     inputMainLabel.textContent = "kWm SAE Corrected";
                     inputSuffix.textContent = "kWm";
-                    baseKwmInput.max = "10000";
                     // Convert existing number from HP to kWm
                     if (hasValue) {
                         baseKwmInput.value = (currentVal / 1.34102209).toFixed(2);
@@ -629,17 +627,12 @@
                     e.preventDefault();
                 }
             });
-            baseKwmInput.addEventListener("input", (e) => {
+            baseKwmInput.addEventListener("input", () => {
                 const maxVal = inputUnitMode === "HP" ? 13410.22 : 10000;
-                if (parseFloat(e.target.value) > maxVal) {
-                    e.target.value = maxVal.toString();
-                }
-                // Lock to 2 decimal places max
-                if (e.target.value.includes(".")) {
-                    const parts = e.target.value.split(".");
-                    if (parts[1].length > 2) {
-                        e.target.value = parts[0] + "." + parts[1].slice(0, 2);
-                    }
+                const [whole, ...fraction] = baseKwmInput.value.replace(/[^0-9.]/g, "").split(".");
+                baseKwmInput.value = whole + (fraction.length ? "." + fraction.join("").slice(0, 2) : "");
+                if (parseFloat(baseKwmInput.value) > maxVal) {
+                    baseKwmInput.value = maxVal.toString();
                 }
                 calculateMath();
             });
