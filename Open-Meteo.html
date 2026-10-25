@@ -264,7 +264,7 @@
                 margin: 0;
             }
             input[type="number"] {
-                -moz-appearance: textfield;
+                appearance: textfield;
             }
             /* Container to put unit suffix inside the input box */
             .input-wrapper-kwm {
@@ -709,6 +709,7 @@
                                             var geoData = await geoRes.json();
                                         if (geoData.features && geoData.features[0] && geoData.features[0].properties) {
                                             var p = geoData.features[0].properties;
+                                            zipInput.value = (p.postcode || "").replace(/\D/g, "").slice(0, 5);
                                             var houseNumber = p.housenumber || "";
                                             let street = p.street || "";
                                             var locality = p.district || p.suburb || p.neighbourhood || p.city || p.town || p.village || p.municipality || p.county || "";
