@@ -794,7 +794,7 @@
                     weatherStatus.style.color = "#dc3545";
                     return;
                 }
-                weatherStatus.textContent = "Connecting To Network";
+                weatherStatus.textContent = "Locating";
                 weatherStatus.style.color = "#0056b3";
                 try {
                     const geoResponse = await fetch(
@@ -812,7 +812,7 @@
                     const lat = location.latitude;
                     const lon = location.longitude;
                     const elevationFeet = Math.round((location.elevation || 0) * 3.28084);
-                    weatherStatus.textContent = "Fetching Weather Data";
+                    weatherStatus.textContent = "Locating";
                     const weatherResponse = await fetch(
                         "https://api.open-meteo.com/v1/forecast?latitude=" +
                             lat +
