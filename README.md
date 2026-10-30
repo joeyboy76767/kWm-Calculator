@@ -16,4 +16,4 @@
  • JavaScript
 
 📄 License
- • This project is open-source and available under the terms of the [GNU General Public License v3](LICENSE).
+ • This project is open-source and available under the terms of the GNU Affero General Public License v3 [GNU AGPLv3](https://www.gnu.org/licenses/agpl-3.0.html).
