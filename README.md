@@ -3,7 +3,7 @@
  • This project deals with SAE J1349 correction of kWm to calculate kWm at your specific On-site location.
 
 🚀 Live Demo
- • You can view the live site here: https://joeyboy76767.github.io/kWm-Calculator/Open-Meteo.html
+ • You can view the live site here: [kWm Calculator](https://joeyboy76767.github.io/kWm-Calculator/Open-Meteo.html)
 
 ✨ Features
  • Converts SAE Correccted kWm to other Site location kWm.
