@@ -90,6 +90,8 @@
       .group-input {
         background-color: var(--pastel-brown);
         position: relative;
+        padding-left: 0;
+        padding-right: 0;
         transition: background-color 0.25s ease;
       }
       .group-input.hp-mode {
@@ -103,28 +105,26 @@
         box-sizing: border-box;
       }
       .top-controls {
-        display: flex;
+        display: grid;
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+        column-gap: 8px;
         align-items: center;
-        justify-content: space-between;
+        justify-items: center;
         min-height: 38px;
-        margin: -5px 2px 6px;
+        margin: -5px 1px 6px;
       }
       .power-inputs {
         display: flex;
         align-items: flex-start;
-        gap: 4px;
-        flex: 0 1 312px;
-        width: 312px;
+        gap: 8px;
+        width: 100%;
       }
       .power-input-group {
         flex: 1;
         min-width: 0;
       }
-      .power-input-group:first-child {
-        flex: 0 0 158px;
-      }
       .fan-input-group {
-        flex: 0 0 130px;
+        flex: 1;
       }
       .power-input-label {
         display: flex !important;
@@ -132,27 +132,8 @@
         justify-content: center;
         min-height: 28px;
         margin-bottom: 4px !important;
-        font-size: 14px !important;
+        font-size: 16px !important;
         line-height: 1.1;
-      }
-      .power-input-group:first-child .input-wrapper-kwm {
-        margin-left: auto;
-        margin-right: 0;
-      }
-      @media (max-width: 340px) {
-        .power-inputs {
-          flex-basis: 100%;
-          width: 100%;
-        }
-        .power-input-group:first-child {
-          flex: 1 1 0;
-        }
-        .fan-input-group {
-          flex-basis: 118px;
-        }
-        .power-input-group:first-child .input-wrapper-kwm {
-          max-width: 100%;
-        }
       }
       /* Turbo Toggle on the right side */
       .turbo-container {
@@ -333,7 +314,8 @@
         background-color: #ffffff;
       }
       .input-wrapper-fan {
-        max-width: none;
+        width: 100%;
+        max-width: 150px;
       }
       .input-wrapper-fan input {
         font-size: 16px;
