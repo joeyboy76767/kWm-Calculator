@@ -95,20 +95,21 @@
       .group-input.hp-mode {
         background-color: var(--pastel-red-input);
       }
-      /* Balances space for the left pill toggle AND right turbo toggle */
       .input-layout-row {
-        position: relative;
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: center;
-        padding-left: 58px; /* Space for the compact unit toggle */
-        padding-right: 58px; /* Space for Turbo */
         box-sizing: border-box;
       }
+      .top-controls {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        min-height: 38px;
+        margin: -5px 2px 6px;
+      }
       .power-inputs {
-        position: relative;
-        left: 12px;
         display: flex;
         align-items: flex-start;
         gap: 4px;
@@ -138,17 +139,27 @@
         margin-left: auto;
         margin-right: 0;
       }
+      @media (max-width: 340px) {
+        .power-inputs {
+          flex-basis: 100%;
+          width: 100%;
+        }
+        .power-input-group:first-child {
+          flex: 1 1 0;
+        }
+        .fan-input-group {
+          flex-basis: 118px;
+        }
+        .power-input-group:first-child .input-wrapper-kwm {
+          max-width: 100%;
+        }
+      }
       /* Turbo Toggle on the right side */
       .turbo-container {
-        position: absolute;
-        right: 4px;
-        top: 50%;
-        transform: translateY(-50%);
         display: flex;
-        flex-direction: column;
+        flex-direction: row;
         align-items: center;
-        gap: 1px;
-        z-index: 2;
+        gap: 5px;
       }
       .turbo-label {
         font-size: 13px;
@@ -159,24 +170,11 @@
         font-size: 13px;
         font-weight: 800;
         color: #000000;
-        margin-top: 1px;
-      }
-      @media (max-width: 380px) {
-        .input-layout-row {
-          padding: 38px 0 0;
-        }
-        .input-layout-row .unit-toggle-pill,
-        .input-layout-row .turbo-container {
-          top: 0;
-          transform: none;
-        }
+        margin-top: 0;
       }
       /* Either-Or Pill Capsule Toggle */
       .unit-toggle-pill {
-        position: absolute;
-        left: 2px;
-        top: 50%;
-        transform: translateY(-50%);
+        position: static;
         display: flex;
         background-color: #ccc; /* Exact same gray as the Live Site toggle */
         border-radius: 20px;
@@ -498,29 +496,41 @@
           Power Correction Calculator
         </h2>
       </div>
-      <!-- Single Input Box with Left Pill Toggle and Right Turbo Toggle -->
+      <div class="top-controls">
+        <div class="unit-toggle-pill">
+          <button
+            type="button"
+            class="pill-btn active"
+            id="btnKwm"
+            onclick="setInputUnit('kWm')"
+          >
+            kWm
+          </button>
+          <button
+            type="button"
+            class="pill-btn"
+            id="btnHp"
+            onclick="setInputUnit('HP')"
+          >
+            HP
+          </button>
+        </div>
+        <div class="turbo-container">
+          <span class="turbo-label">Turbo</span>
+          <label class="switch">
+            <input
+              type="checkbox"
+              id="turboToggle"
+              onchange="toggleTurboMode()"
+            />
+            <span class="toggle-slider"></span>
+          </label>
+          <div id="turboStatusText" class="turbo-status">Off</div>
+        </div>
+      </div>
+      <!-- Engine and fan power inputs -->
       <div class="input-group group-input" id="inputCard">
         <div class="input-layout-row">
-          <!-- Far Left: Unit Pill -->
-          <div class="unit-toggle-pill">
-            <button
-              type="button"
-              class="pill-btn active"
-              id="btnKwm"
-              onclick="setInputUnit('kWm')"
-            >
-              kWm
-            </button>
-            <button
-              type="button"
-              class="pill-btn"
-              id="btnHp"
-              onclick="setInputUnit('HP')"
-            >
-              HP
-            </button>
-          </div>
-          <!-- Center: Engine and fan power inputs -->
           <div class="power-inputs">
             <div class="power-input-group">
               <label
@@ -556,19 +566,6 @@
                 <span class="kwm-inside-label" id="fanInputSuffix">kWm</span>
               </div>
             </div>
-          </div>
-          <!-- Far Right: Turbo Toggle -->
-          <div class="turbo-container">
-            <span class="turbo-label">Turbo</span>
-            <label class="switch">
-              <input
-                type="checkbox"
-                id="turboToggle"
-                onchange="toggleTurboMode()"
-              />
-              <span class="toggle-slider"></span>
-            </label>
-            <div id="turboStatusText" class="turbo-status">Off</div>
           </div>
         </div>
       </div>
