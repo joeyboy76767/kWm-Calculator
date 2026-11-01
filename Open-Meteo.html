@@ -100,12 +100,43 @@
         position: relative;
         width: 100%;
         display: flex;
-        flex-direction: column;
         align-items: center;
         justify-content: center;
-        padding-left: 64px; /* Space for [kWm | HP] */
-        padding-right: 54px; /* Space for Turbo */
+        padding-left: 58px; /* Space for the compact unit toggle */
+        padding-right: 58px; /* Space for Turbo */
         box-sizing: border-box;
+      }
+      .power-inputs {
+        position: relative;
+        left: 12px;
+        display: flex;
+        align-items: flex-start;
+        gap: 4px;
+        flex: 0 1 312px;
+        width: 312px;
+      }
+      .power-input-group {
+        flex: 1;
+        min-width: 0;
+      }
+      .power-input-group:first-child {
+        flex: 0 0 158px;
+      }
+      .fan-input-group {
+        flex: 0 0 130px;
+      }
+      .power-input-label {
+        display: flex !important;
+        align-items: center;
+        justify-content: center;
+        min-height: 28px;
+        margin-bottom: 4px !important;
+        font-size: 14px !important;
+        line-height: 1.1;
+      }
+      .power-input-group:first-child .input-wrapper-kwm {
+        margin-left: auto;
+        margin-right: 0;
       }
       /* Turbo Toggle on the right side */
       .turbo-container {
@@ -130,6 +161,16 @@
         color: #000000;
         margin-top: 1px;
       }
+      @media (max-width: 380px) {
+        .input-layout-row {
+          padding: 38px 0 0;
+        }
+        .input-layout-row .unit-toggle-pill,
+        .input-layout-row .turbo-container {
+          top: 0;
+          transform: none;
+        }
+      }
       /* Either-Or Pill Capsule Toggle */
       .unit-toggle-pill {
         position: absolute;
@@ -148,9 +189,9 @@
         background: transparent;
         border: none;
         border-radius: 16px;
-        font-size: 12px;
+        font-size: 11px;
         font-weight: 800;
-        padding: 4px 7px;
+        padding: 3px 4px;
         cursor: pointer;
         color: #000000;
         outline: none;
@@ -284,14 +325,21 @@
       }
       .input-wrapper-kwm input {
         width: 100%;
-        padding: 8px 45px 8px 12px; /* 45px right padding leaves room for "kWm" or "HP" */
+        padding: 8px 40px 8px 8px;
         border: 1px solid var(--border-color);
         border-radius: 6px;
-        font-size: 18px;
+        font-size: 16px;
         font-weight: bold;
         box-sizing: border-box;
         text-align: center;
         background-color: #ffffff;
+      }
+      .input-wrapper-fan {
+        max-width: none;
+      }
+      .input-wrapper-fan input {
+        font-size: 16px;
+        padding-right: 52px;
       }
       .kwm-inside-label {
         position: absolute;
@@ -472,17 +520,42 @@
               HP
             </button>
           </div>
-          <!-- Center: Input & Label -->
-          <label for="baseKwm" id="inputMainLabel">kWm SAE Corrected</label>
-          <div class="input-wrapper-kwm">
-            <input
-              type="text"
-              id="baseKwm"
-              inputmode="decimal"
-              placeholder="0.00"
-              autofocus
-            />
-            <span class="kwm-inside-label" id="inputSuffix">kWm</span>
+          <!-- Center: Engine and fan power inputs -->
+          <div class="power-inputs">
+            <div class="power-input-group">
+              <label
+                for="baseKwm"
+                id="inputMainLabel"
+                class="power-input-label"
+                >kWm SAE Corrected</label
+              >
+              <div class="input-wrapper-kwm">
+                <input
+                  type="text"
+                  id="baseKwm"
+                  inputmode="decimal"
+                  placeholder="0.00"
+                  autofocus
+                />
+                <span class="kwm-inside-label" id="inputSuffix">kWm</span>
+              </div>
+            </div>
+            <div class="power-input-group fan-input-group">
+              <label for="baseFanLoss" class="power-input-label"
+                >Fan Loss</label
+              >
+              <div class="input-wrapper-kwm input-wrapper-fan">
+                <input
+                  type="text"
+                  id="baseFanLoss"
+                  inputmode="decimal"
+                  maxlength="6"
+                  placeholder="0"
+                  aria-label="Fan loss input"
+                />
+                <span class="kwm-inside-label" id="fanInputSuffix">kWm</span>
+              </div>
+            </div>
           </div>
           <!-- Far Right: Turbo Toggle -->
           <div class="turbo-container">
@@ -602,6 +675,7 @@
       const altitudeSlider = document.getElementById("altitude");
       const altitudeVal = document.getElementById("altitudeVal");
       const baseKwmInput = document.getElementById("baseKwm");
+      const baseFanLossInput = document.getElementById("baseFanLoss");
       const outputKwm = document.getElementById("outputKwm");
       const outputHp = document.getElementById("outputHp");
       const zipInput = document.getElementById("zipInput");
@@ -612,11 +686,13 @@
       const inputCard = document.getElementById("inputCard");
       const inputMainLabel = document.getElementById("inputMainLabel");
       const inputSuffix = document.getElementById("inputSuffix");
+      const fanInputSuffix = document.getElementById("fanInputSuffix");
       const btnKwm = document.getElementById("btnKwm");
       const btnHp = document.getElementById("btnHp");
       let inputUnitMode = "kWm"; // Tracks 'kWm' or 'HP'
       // Turbo Toggle Elements
       const turboToggle = document.getElementById("turboToggle");
+      const turboLabel = document.querySelector(".turbo-label");
       const turboStatusText = document.getElementById("turboStatusText");
       // Global variable for the hardware chip
       let phoneBarometerSensor = null;
@@ -627,15 +703,24 @@
         inputUnitMode = unit;
         let currentVal = parseFloat(baseKwmInput.value);
         const hasValue = !isNaN(currentVal) && currentVal > 0;
+        const currentFanLoss = parseFloat(baseFanLossInput.value);
+        const hasFanLoss = !isNaN(currentFanLoss) && currentFanLoss > 0;
         if (unit === "HP") {
           btnKwm.classList.remove("active");
           btnHp.classList.add("active");
           inputCard.classList.add("hp-mode");
           inputMainLabel.textContent = "HP SAE Corrected";
           inputSuffix.textContent = "HP";
+          fanInputSuffix.textContent = "HP";
           // Convert existing number from kWm to HP
           if (hasValue) {
             baseKwmInput.value = (currentVal * 1.34102209).toFixed(2);
+          }
+          if (hasFanLoss) {
+            baseFanLossInput.value = Math.min(
+              currentFanLoss * 1.34102209,
+              134.1,
+            ).toFixed(2);
           }
         } else {
           btnHp.classList.remove("active");
@@ -643,9 +728,16 @@
           inputCard.classList.remove("hp-mode");
           inputMainLabel.textContent = "kWm SAE Corrected";
           inputSuffix.textContent = "kWm";
+          fanInputSuffix.textContent = "kWm";
           // Convert existing number from HP to kWm
           if (hasValue) {
             baseKwmInput.value = (currentVal / 1.34102209).toFixed(2);
+          }
+          if (hasFanLoss) {
+            baseFanLossInput.value = Math.min(
+              currentFanLoss / 1.34102209,
+              100,
+            ).toFixed(2);
           }
         }
         calculateMath();
@@ -655,9 +747,11 @@
         if (turboToggle.checked) {
           turboStatusText.textContent = "On";
           turboStatusText.style.color = "#0056b3";
+          turboLabel.style.color = "#0056b3";
         } else {
           turboStatusText.textContent = "Off";
           turboStatusText.style.color = "#000000";
+          turboLabel.style.color = "#000000";
         }
         calculateMath();
       }
@@ -724,6 +818,28 @@
           whole + (fraction.length ? "." + fraction.join("").slice(0, 2) : "");
         if (parseFloat(baseKwmInput.value) > maxVal) {
           baseKwmInput.value = maxVal.toString();
+        }
+        calculateMath();
+      });
+      baseFanLossInput.addEventListener("keydown", (e) => {
+        if (
+          e.key === "-" ||
+          e.key === "+" ||
+          e.key === "e" ||
+          e.key === "E"
+        ) {
+          e.preventDefault();
+        }
+      });
+      baseFanLossInput.addEventListener("input", () => {
+        const maxValue = inputUnitMode === "HP" ? 134.1 : 100;
+        const [whole, ...fraction] = baseFanLossInput.value
+          .replace(/[^0-9.]/g, "")
+          .split(".");
+        baseFanLossInput.value =
+          whole + (fraction.length ? "." + fraction.join("").slice(0, 2) : "");
+        if (parseFloat(baseFanLossInput.value) > maxValue) {
+          baseFanLossInput.value = maxValue.toFixed(2);
         }
         calculateMath();
       });
@@ -1034,16 +1150,14 @@
         const saeTargetPressure = 29.23; // SAE J1349 standard (99.0 kPa from Texas dyno)
         const standardSeaLevel = 29.92; // True Earth atmospheric pressure at sea level
         const standardTempKelvin = 298.15; // 77 °F
-        let baroPressure;
-        if (turboToggle.checked) {
-          // Turbo maintains manifold boost, bypassing altitude loss
-          baroPressure = saeTargetPressure; // 29.23 inHg baseline
-        } else if (liveStationPressureInHg !== null) {
-          baroPressure = liveStationPressureInHg;
-        } else {
-          baroPressure =
-            standardSeaLevel * Math.pow(1 - 0.0000068756 * altitude, 5.25588);
-        }
+        const ambientBaroPressure =
+          liveStationPressureInHg !== null
+            ? liveStationPressureInHg
+            : standardSeaLevel *
+              Math.pow(1 - 0.0000068756 * altitude, 5.25588);
+        const baroPressure = turboToggle.checked
+          ? Math.max(ambientBaroPressure, saeTargetPressure)
+          : ambientBaroPressure;
         const tempC = ((temp - 32) * 5) / 9;
         const satVaporPressureMb =
           6.1078 * Math.pow(10, (7.5 * tempC) / (tempC + 237.3));
@@ -1060,6 +1174,13 @@
           finalKwm = kwm / saeCorrectionFactor;
           finalHp = finalKwm * 1.34102209; // 8 decimal point SAE Mechanical Horsepower conversion
         }
+        const fanLossValue = parseFloat(baseFanLossInput.value) || 0;
+        const fanLossHp =
+          (inputUnitMode === "HP" ? fanLossValue : fanLossValue * 1.34102209) *
+          (ambientBaroPressure / standardSeaLevel) *
+          (528 / (460 + temp));
+        finalHp = Math.max(0, finalHp - fanLossHp);
+        finalKwm = finalHp / 1.34102209;
         outputKwm.textContent = finalKwm.toFixed(2) + " kWm";
         outputHp.textContent = finalHp.toFixed(2) + " HP";
       }
