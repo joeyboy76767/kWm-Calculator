@@ -226,6 +226,7 @@
       }
       .search-field {
         width: 90px; /* Reduced from 120px to give the toggle and button more width space */
+        height: 40px;
         padding: 10px 4px;
         border: 1px solid var(--border-color);
         border-radius: 6px;
@@ -258,7 +259,7 @@
       }
       .group-temp {
         background-color: var(--pastel-red);
-        margin-bottom: 12px;
+        margin-bottom: 6px;
       }
       .input-group label,
       .nested-group label,
@@ -337,9 +338,9 @@
       }
       .button-container {
         display: flex;
-        gap: 10px;
+        gap: 6px;
         margin-top: 0;
-        padding-top: 4px;
+        padding-top: 0;
       }
       .btn {
         padding: 12px;
@@ -351,11 +352,14 @@
         transition: opacity 0.2s;
       }
       .btn-weather {
-        background-color: var(--primary-blue);
+        background-color: #28a745;
         color: black;
-        padding: 10px 8px; /* Narrower internal room for small mobile screens */
+        width: 90px;
+        height: 40px;
+        padding: 0 4px;
         border: 1px solid var(--border-color);
         font-size: 13px; /* Dropped from 13px so text stays locked inside boundaries */
+        box-sizing: border-box;
         white-space: nowrap;
       }
       .btn-reset {
@@ -722,7 +726,6 @@
           }
         }
         calculateMath();
-        baseKwmInput.focus();
       }
       function toggleTurboMode() {
         if (turboToggle.checked) {
