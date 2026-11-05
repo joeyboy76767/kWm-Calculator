@@ -152,6 +152,9 @@
         font-weight: 800;
         color: #000000;
         margin-top: 0;
+        width: 3ch;
+        flex: 0 0 3ch;
+        white-space: nowrap;
       }
       /* Either-Or Pill Capsule Toggle */
       .unit-toggle-pill {
@@ -525,7 +528,7 @@
                 for="baseKwm"
                 id="inputMainLabel"
                 class="power-input-label"
-                >kWm SAE Corrected</label
+                >SAE Corrected Input</label
               >
               <div class="input-wrapper-kwm">
                 <input
@@ -539,8 +542,11 @@
               </div>
             </div>
             <div class="power-input-group fan-input-group">
-              <label for="baseFanLoss" class="power-input-label"
-                >Fan Loss</label
+              <label
+                for="baseFanLoss"
+                id="fanLossLabel"
+                class="power-input-label"
+                >Fan Loss Input</label
               >
               <div class="input-wrapper-kwm input-wrapper-fan">
                 <input
@@ -560,13 +566,13 @@
       <!-- Side-by-Side Dual Output Gauges -->
       <div class="output-row">
         <div class="output-box box-kwm">
-          <label>kWm Site</label>
+          <label>Site</label>
           <div id="outputKwm" class="value" style="margin-top: 4px">
             0.00 kWm
           </div>
         </div>
         <div class="output-box box-hp">
-          <label>HP Site</label>
+          <label>Site</label>
           <div id="outputHp" class="value" style="margin-top: 4px">0.00 HP</div>
         </div>
       </div>
@@ -595,7 +601,7 @@
             placeholder="ZIP Code"
           />
           <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">
-            Current ZIP
+            GET ZIP
           </button>
         </div>
         <div id="weatherStatus" class="status-text"></div>
@@ -671,6 +677,7 @@
       const inputCard = document.getElementById("inputCard");
       const inputMainLabel = document.getElementById("inputMainLabel");
       const inputSuffix = document.getElementById("inputSuffix");
+      const fanLossLabel = document.getElementById("fanLossLabel");
       const fanInputSuffix = document.getElementById("fanInputSuffix");
       const btnKwm = document.getElementById("btnKwm");
       const btnHp = document.getElementById("btnHp");
@@ -694,7 +701,8 @@
           btnKwm.classList.remove("active");
           btnHp.classList.add("active");
           inputCard.classList.add("hp-mode");
-          inputMainLabel.textContent = "HP SAE Corrected";
+          inputMainLabel.textContent = "SAE Corrected Input";
+          fanLossLabel.textContent = "Fan Loss Input";
           inputSuffix.textContent = "HP";
           fanInputSuffix.textContent = "HP";
           // Convert existing number from kWm to HP
@@ -711,7 +719,8 @@
           btnHp.classList.remove("active");
           btnKwm.classList.add("active");
           inputCard.classList.remove("hp-mode");
-          inputMainLabel.textContent = "kWm SAE Corrected";
+          inputMainLabel.textContent = "SAE Corrected Input";
+          fanLossLabel.textContent = "Fan Loss Input";
           inputSuffix.textContent = "kWm";
           fanInputSuffix.textContent = "kWm";
           // Convert existing number from HP to kWm
