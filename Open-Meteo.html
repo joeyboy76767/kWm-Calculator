@@ -1131,6 +1131,11 @@
           weatherStatus.style.color = "#dc3545";
         }
       }
+      function getAmbientBaroPressure(altitude) {
+        return liveStationPressureInHg !== null
+          ? liveStationPressureInHg
+          : 29.92 * Math.pow(1 - 0.0000068756 * altitude, 5.25588);
+      }
       function calculateMath() {
         let rawInputValue = parseFloat(baseKwmInput.value);
         const rawVal = isNaN(rawInputValue) ? 0 : rawInputValue;
@@ -1143,11 +1148,7 @@
         const saeTargetPressure = 29.23; // SAE J1349 standard (99.0 kPa from Texas dyno)
         const standardSeaLevel = 29.92; // True Earth atmospheric pressure at sea level
         const standardTempKelvin = 298.15; // 77 °F
-        const ambientBaroPressure =
-          liveStationPressureInHg !== null
-            ? liveStationPressureInHg
-            : standardSeaLevel *
-              Math.pow(1 - 0.0000068756 * altitude, 5.25588);
+        const ambientBaroPressure = getAmbientBaroPressure(altitude);
         const baroPressure = turboToggle.checked
           ? Math.max(ambientBaroPressure, saeTargetPressure)
           : ambientBaroPressure;
@@ -1248,7 +1249,11 @@
         altitudeSlider.value = 1465;
         altitudeVal.textContent = "1,465 Feet";
         zipInput.value = "54487";
-        weatherStatus.textContent = "Zenith Plant 28.37 inHg";
+        const ambientBaroPressure = getAmbientBaroPressure(
+          parseInt(altitudeSlider.value),
+        );
+        weatherStatus.textContent =
+          "Zenith Plant " + ambientBaroPressure.toFixed(2) + " inHg";
         weatherStatus.style.color = "#000000";
         document.querySelector(".toggle-label").style.color = "#000000";
         calculateMath();
