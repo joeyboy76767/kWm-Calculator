@@ -104,29 +104,26 @@
         justify-content: center;
         box-sizing: border-box;
       }
-      .top-controls {
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        min-height: 38px;
-        margin: -5px 1px 6px;
-      }
+      .power-control-row,
       .power-inputs {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+        grid-template-columns: repeat(2, minmax(0, 1fr));
         gap: 8px;
+        width: 100%;
+      }
+      .power-control-row {
+        align-items: center;
+        margin-bottom: 4px;
+      }
+      .power-input-content {
         width: 100%;
       }
       .power-input-group {
         min-width: 0;
       }
-      .power-unit-toggle {
-        align-self: flex-start;
-        padding: 2px 1px;
-      }
-      .power-unit-toggle .pill-btn {
-        font-size: 10px;
-        padding: 3px 2px;
+      .power-unit-toggle-cell,
+      .turbo-container {
+        justify-self: center;
       }
       .power-input-label {
         display: flex !important;
@@ -137,6 +134,7 @@
         font-size: 16px !important;
         line-height: 1.1;
       }
+      /* Primary test viewport: Galaxy A35 portrait, 384 x 692 CSS pixels. */
       @media (max-width: 400px) {
         .power-input-label {
           min-height: 35px;
@@ -146,33 +144,13 @@
         .power-input-label {
           min-height: 53px;
         }
-        .power-inputs {
-          position: relative;
-          display: flex;
-          align-items: flex-start;
-        }
-        .power-input-group {
-          flex: 1;
-        }
-        .unit-toggle-pill.power-unit-toggle {
-          position: absolute;
-          top: 0;
-          left: 50%;
-          transform: translateX(-50%);
-        }
-        .power-input-group:first-child .power-input-label {
-          padding-right: 35px;
-        }
-        .power-input-group:last-child .power-input-label {
-          padding-left: 35px;
-        }
       }
-      /* Turbo Toggle on the right side */
       .turbo-container {
         display: flex;
         flex-direction: row;
         align-items: center;
         gap: 5px;
+        white-space: nowrap;
       }
       .turbo-label {
         font-size: 13px;
@@ -523,77 +501,79 @@
           Power Correction Calculator
         </h2>
       </div>
-      <div class="top-controls">
-        <div class="turbo-container">
-          <span class="turbo-label">Turbo</span>
-          <label class="switch">
-            <input
-              type="checkbox"
-              id="turboToggle"
-              onchange="toggleTurboMode()"
-            />
-            <span class="toggle-slider"></span>
-          </label>
-          <div id="turboStatusText" class="turbo-status">Off</div>
-        </div>
-      </div>
       <!-- Engine and fan power inputs -->
       <div class="input-group group-input" id="inputCard">
         <div class="input-layout-row">
-          <div class="power-inputs">
-            <div class="power-input-group">
-              <label
-                for="baseKwm"
-                id="inputMainLabel"
-                class="power-input-label"
-                >SAE Corrected Input</label
-              >
-              <div class="input-wrapper-kwm">
-                <input
-                  type="text"
-                  id="baseKwm"
-                  inputmode="decimal"
-                  placeholder="0.00"
-                  autofocus
-                />
-                <span class="kwm-inside-label" id="inputSuffix">kWm</span>
+          <div class="power-input-content">
+            <div class="power-control-row">
+              <div class="power-unit-toggle-cell">
+                <div class="unit-toggle-pill">
+                  <button
+                    type="button"
+                    class="pill-btn active"
+                    id="btnKwm"
+                    onclick="setInputUnit('kWm')"
+                  >
+                    kWm
+                  </button>
+                  <button
+                    type="button"
+                    class="pill-btn"
+                    id="btnHp"
+                    onclick="setInputUnit('HP')"
+                  >
+                    HP
+                  </button>
+                </div>
+              </div>
+              <div class="turbo-container">
+                <span class="turbo-label">Turbo</span>
+                <label class="switch">
+                  <input
+                    type="checkbox"
+                    id="turboToggle"
+                    onchange="toggleTurboMode()"
+                  />
+                  <span class="toggle-slider"></span>
+                </label>
+                <div id="turboStatusText" class="turbo-status">Off</div>
               </div>
             </div>
-            <div class="unit-toggle-pill power-unit-toggle">
-              <button
-                type="button"
-                class="pill-btn active"
-                id="btnKwm"
-                onclick="setInputUnit('kWm')"
-              >
-                kWm
-              </button>
-              <button
-                type="button"
-                class="pill-btn"
-                id="btnHp"
-                onclick="setInputUnit('HP')"
-              >
-                HP
-              </button>
-            </div>
-            <div class="power-input-group">
-              <label
-                for="baseFanLoss"
-                id="fanLossLabel"
-                class="power-input-label"
-                >Fan Loss Input</label
-              >
-              <div class="input-wrapper-kwm input-wrapper-fan">
-                <input
-                  type="text"
-                  id="baseFanLoss"
-                  inputmode="decimal"
-                  maxlength="6"
-                  placeholder="0"
-                  aria-label="Fan loss input"
-                />
-                <span class="kwm-inside-label" id="fanInputSuffix">kWm</span>
+            <div class="power-inputs">
+              <div class="power-input-group">
+                <label
+                  for="baseKwm"
+                  id="inputMainLabel"
+                  class="power-input-label"
+                  >SAE Corrected Input</label>
+                <div class="input-wrapper-kwm">
+                  <input
+                    type="text"
+                    id="baseKwm"
+                    inputmode="decimal"
+                    placeholder="0.00"
+                    autofocus
+                  />
+                  <span class="kwm-inside-label" id="inputSuffix">kWm</span>
+                </div>
+              </div>
+              <div class="power-input-group">
+                <label
+                  for="baseFanLoss"
+                  id="fanLossLabel"
+                  class="power-input-label"
+                  >Fan Loss Input</label>
+                <div class="input-wrapper-kwm input-wrapper-fan">
+                  <input
+                    type="text"
+                    id="baseFanLoss"
+                    inputmode="decimal"
+                    maxlength="6"
+                    placeholder="0"
+                    aria-label="Fan loss input"
+                  />
+                  <span class="kwm-inside-label" id="fanInputSuffix">kWm</span>
+                </div>
               </div>
             </div>
           </div>
