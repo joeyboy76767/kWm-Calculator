@@ -105,26 +105,23 @@
         box-sizing: border-box;
       }
       .top-controls {
-        display: grid;
-        grid-template-columns: repeat(2, minmax(0, 1fr));
-        column-gap: 8px;
+        display: flex;
+        justify-content: center;
         align-items: center;
-        justify-items: center;
         min-height: 38px;
         margin: -5px 1px 6px;
       }
       .power-inputs {
-        display: flex;
-        align-items: flex-start;
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
         gap: 8px;
         width: 100%;
       }
       .power-input-group {
-        flex: 1;
         min-width: 0;
       }
-      .fan-input-group {
-        flex: 1;
+      .power-unit-toggle {
+        align-self: flex-start;
       }
       .power-input-label {
         display: flex !important;
@@ -134,6 +131,36 @@
         margin-bottom: 4px !important;
         font-size: 16px !important;
         line-height: 1.1;
+      }
+      @media (max-width: 400px) {
+        .power-input-label {
+          min-height: 35px;
+        }
+      }
+      @media (max-width: 360px) {
+        .power-input-label {
+          min-height: 53px;
+        }
+        .power-inputs {
+          position: relative;
+          display: flex;
+          align-items: flex-start;
+        }
+        .power-input-group {
+          flex: 1;
+        }
+        .unit-toggle-pill.power-unit-toggle {
+          position: absolute;
+          top: 0;
+          left: 50%;
+          transform: translateX(-50%);
+        }
+        .power-input-group:first-child .power-input-label {
+          padding-right: 35px;
+        }
+        .power-input-group:last-child .power-input-label {
+          padding-left: 35px;
+        }
       }
       /* Turbo Toggle on the right side */
       .turbo-container {
@@ -224,8 +251,14 @@
         display: flex;
         gap: 8px;
         width: 100%;
-        justify-content: center;
+        justify-content: flex-start;
         align-items: center;
+      }
+      .zip-controls {
+        display: flex;
+        flex: 1;
+        justify-content: center;
+        gap: 8px;
       }
       .search-field {
         width: 90px; /* Reduced from 120px to give the toggle and button more width space */
@@ -400,8 +433,6 @@
         flex-direction: column;
         align-items: center;
         gap: 2px;
-        margin-left: -20px; /* Pulls just the toggle unit to the left */
-        margin-right: 20px; /* Prevents the zip field from moving with it */
         transform: translateY(10px);
       }
       .toggle-label {
@@ -488,24 +519,6 @@
         </h2>
       </div>
       <div class="top-controls">
-        <div class="unit-toggle-pill">
-          <button
-            type="button"
-            class="pill-btn active"
-            id="btnKwm"
-            onclick="setInputUnit('kWm')"
-          >
-            kWm
-          </button>
-          <button
-            type="button"
-            class="pill-btn"
-            id="btnHp"
-            onclick="setInputUnit('HP')"
-          >
-            HP
-          </button>
-        </div>
         <div class="turbo-container">
           <span class="turbo-label">Turbo</span>
           <label class="switch">
@@ -541,7 +554,25 @@
                 <span class="kwm-inside-label" id="inputSuffix">kWm</span>
               </div>
             </div>
-            <div class="power-input-group fan-input-group">
+            <div class="unit-toggle-pill power-unit-toggle">
+              <button
+                type="button"
+                class="pill-btn active"
+                id="btnKwm"
+                onclick="setInputUnit('kWm')"
+              >
+                kWm
+              </button>
+              <button
+                type="button"
+                class="pill-btn"
+                id="btnHp"
+                onclick="setInputUnit('HP')"
+              >
+                HP
+              </button>
+            </div>
+            <div class="power-input-group">
               <label
                 for="baseFanLoss"
                 id="fanLossLabel"
@@ -591,18 +622,20 @@
             </label>
             <div id="liveBaroText" class="live-baro-display">Off</div>
           </div>
-          <input
-            type="text"
-            pattern="[0-9]*"
-            inputmode="numeric"
-            id="zipInput"
-            class="search-field"
-            maxlength="5"
-            placeholder="ZIP Code"
-          />
-          <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">
-            GET ZIP
-          </button>
+          <div class="zip-controls">
+            <input
+              type="text"
+              pattern="[0-9]*"
+              inputmode="numeric"
+              id="zipInput"
+              class="search-field"
+              maxlength="5"
+              placeholder="ZIP Code"
+            />
+            <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">
+              GET ZIP
+            </button>
+          </div>
         </div>
         <div id="weatherStatus" class="status-text"></div>
       </div>
