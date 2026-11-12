@@ -59,20 +59,6 @@
         margin: 5px auto 0 auto;
         border: 1px solid var(--thin-line-color);
       }
-      .viewport-debug {
-        position: fixed;
-        top: 8px;
-        right: 8px;
-        z-index: 10;
-        max-width: calc(100vw - 16px);
-        padding: 8px;
-        border: 1px solid #000000;
-        border-radius: 6px;
-        background: #ffffff;
-        color: #000000;
-        font: 12px/1.4 monospace;
-        white-space: pre-line;
-      }
       .header {
         text-align: center;
         padding-bottom: 2px;
@@ -148,7 +134,7 @@
         font-size: 16px !important;
         line-height: 1.1;
       }
-      /* Primary test viewport: Galaxy A35 portrait, 384 x 692 CSS pixels. */
+      /* Primary test viewport: Galaxy A35 PWA portrait, 384 x 748 CSS pixels. */
       @media (max-width: 400px) {
         .power-input-label {
           min-height: 35px;
@@ -490,7 +476,6 @@
     </style>
   </head>
   <body>
-    <div class="viewport-debug" id="viewportDebug" aria-live="polite"></div>
     <div class="calculator-card">
       <div class="header">
         <h1
@@ -1311,23 +1296,6 @@
       // Initial run on script execution
       setSAECorrected();
       baseKwmInput.focus();
-      const viewportDebug = document.getElementById("viewportDebug");
-      function updateViewportDebug() {
-        const visualViewport = window.visualViewport;
-        viewportDebug.textContent = [
-          `Viewport: ${window.innerWidth} x ${window.innerHeight} CSS px`,
-          visualViewport
-            ? `Visible: ${Math.round(visualViewport.width)} x ${Math.round(visualViewport.height)} CSS px`
-            : "",
-          `Screen: ${screen.width} x ${screen.height} CSS px`,
-          `DPR: ${window.devicePixelRatio.toFixed(2)}`,
-        ]
-          .filter(Boolean)
-          .join("\n");
-      }
-      updateViewportDebug();
-      window.addEventListener("resize", updateViewportDebug);
-      window.visualViewport?.addEventListener("resize", updateViewportDebug);
       if ("serviceWorker" in navigator) {
         navigator.serviceWorker
           .register("./sw.js")
