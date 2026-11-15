@@ -257,6 +257,12 @@
         text-align: center;
         box-sizing: border-box;
       }
+      #zipInput::placeholder {
+        color: #666666;
+        opacity: 1;
+        font-size: 13px;
+        font-weight: 800;
+      }
       .pressure-box {
         flex: 0 0 100px;
         min-height: 38px;
@@ -272,9 +278,15 @@
         text-align: center;
       }
       .pressure-value {
+        color: #000000;
         font-size: 16px;
         font-weight: 800;
         line-height: 1.1;
+      }
+      .pressure-unit-label {
+        color: #666666;
+        font-size: 15px;
+        font-weight: 800;
       }
       .environmental-wrapper {
         background-color: var(--environmental-bg);
@@ -456,6 +468,9 @@
           width: 90px;
           height: 38px;
           font-size: 14px;
+        }
+        #zipInput::placeholder {
+          font-size: 11px;
         }
         .btn-weather {
           flex: 0 0 66px;
@@ -680,7 +695,7 @@
           <div class="pressure-box" aria-label="Barometric pressure">
             <div id="pressureValue" class="pressure-value">
               <span id="pressureNumber">29.23</span>
-              <span class="unit-label">inHg</span>
+              <span class="pressure-unit-label">inHg</span>
             </div>
           </div>
         </div>
