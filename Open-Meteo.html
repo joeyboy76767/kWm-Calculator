@@ -771,6 +771,7 @@
       let phoneBarometerSensor = null;
       // Keeps track of the true localized barometric pressure from the weather API
       let liveStationPressureInHg = null;
+      const ZENITH_PLANT_TEMP_F = 70;
       function setInputUnit(unit) {
         if (inputUnitMode === unit) return;
         inputUnitMode = unit;
@@ -1316,27 +1317,46 @@
         };
         return states[name] || stateName.toUpperCase();
       }
-      function resetForm() {
-        liveStationPressureInHg = null;
+      async function resetForm() {
         baroToggle.checked = false;
         liveBaroText.style.visibility = "visible";
         liveBaroText.textContent = "Off";
         liveBaroText.style.color = "#000000";
-        tempSlider.value = 70;
-        tempVal.textContent = "70 °F";
-        humiditySlider.value = 68;
-        humidityVal.textContent = "68 %";
+        tempSlider.value = ZENITH_PLANT_TEMP_F;
+        tempVal.textContent = ZENITH_PLANT_TEMP_F + " °F";
         altitudeSlider.value = 1465;
         altitudeVal.textContent = "1,465 Feet";
         zipInput.value = "54487";
-        const ambientBaroPressure = getAmbientBaroPressure(
-          parseInt(altitudeSlider.value),
-        );
-        weatherStatus.textContent =
-          "Zenith Plant";
-        weatherStatus.style.color = "#000000";
+        weatherStatus.textContent = "Loading Zenith Plant weather...";
+        weatherStatus.style.color = "#0056b3";
         document.querySelector(".toggle-label").style.color = "#000000";
-        calculateMath();
+        try {
+          const weatherResponse = await fetch(
+            "https://api.open-meteo.com/v1/forecast?latitude=45.494365398303025&longitude=-89.73246301791988&current=relative_humidity_2m,surface_pressure&timezone=auto",
+          );
+          if (!weatherResponse.ok) {
+            throw new Error(`Open-Meteo returned ${weatherResponse.status}`);
+          }
+          const weatherData = await weatherResponse.json();
+          const current = weatherData.current;
+          if (
+            !current ||
+            !Number.isFinite(current.relative_humidity_2m) ||
+            !Number.isFinite(current.surface_pressure)
+          ) {
+            throw new Error("Open-Meteo response is missing current conditions");
+          }
+          liveStationPressureInHg = current.surface_pressure * 0.02953;
+          humiditySlider.value = Math.round(current.relative_humidity_2m);
+          humidityVal.textContent = humiditySlider.value + " %";
+          weatherStatus.textContent = "Zenith Plant";
+          weatherStatus.style.color = "#000000";
+          calculateMath();
+        } catch (error) {
+          console.error("Zenith Plant weather fetch failed:", error);
+          weatherStatus.textContent = "Plant weather unavailable";
+          weatherStatus.style.color = "#dc3545";
+        }
       }
       function setSAECorrected() {
         liveStationPressureInHg = 29.23;
