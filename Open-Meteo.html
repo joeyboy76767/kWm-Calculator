@@ -232,19 +232,22 @@
       }
       .search-row {
         display: flex;
-        gap: 8px;
+        gap: 6px;
         width: 100%;
-        justify-content: flex-start;
+        justify-content: space-between;
         align-items: center;
       }
       .zip-controls {
         display: flex;
-        flex: 1;
+        flex: 1 1 auto;
+        min-width: 0;
         justify-content: center;
-        gap: 8px;
+        gap: 6px;
       }
       .search-field {
         width: 90px; /* Reduced from 120px to give the toggle and button more width space */
+        flex: 0 1 90px;
+        min-width: 55px;
         height: 40px;
         padding: 10px 4px;
         border: 1px solid var(--border-color);
@@ -253,6 +256,25 @@
         font-weight: bold;
         text-align: center;
         box-sizing: border-box;
+      }
+      .pressure-box {
+        flex: 0 0 100px;
+        min-height: 38px;
+        padding: 4px;
+        border: 1px solid var(--border-color);
+        border-radius: 6px;
+        background-color: #ffffff;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        box-sizing: border-box;
+        text-align: center;
+      }
+      .pressure-value {
+        font-size: 16px;
+        font-weight: 800;
+        line-height: 1.1;
       }
       .environmental-wrapper {
         background-color: var(--environmental-bg);
@@ -411,12 +433,42 @@
         color: #000000;
         white-space: nowrap;
       }
+      .unit-label {
+        color: #666666;
+      }
       .toggle-container {
         display: flex;
         flex-direction: column;
         align-items: center;
         gap: 2px;
+        flex: 0 0 auto;
         transform: translateY(10px);
+      }
+      @media (max-width: 400px) {
+        .search-row {
+          gap: 4px;
+        }
+        .zip-controls {
+          gap: 4px;
+        }
+        .search-field {
+          flex-basis: 90px;
+          width: 90px;
+          height: 38px;
+          font-size: 14px;
+        }
+        .btn-weather {
+          flex: 0 0 66px;
+          width: 66px;
+          height: 38px;
+          font-size: 11px;
+        }
+        .pressure-box {
+          flex-basis: 82px;
+        }
+        .pressure-value {
+          font-size: 13px;
+        }
       }
       .toggle-label {
         font-size: 15px;
@@ -583,13 +635,17 @@
       <div class="output-row">
         <div class="output-box box-kwm">
           <label>Site</label>
-          <div id="outputKwm" class="value" style="margin-top: 4px">
-            0.00 kWm
+          <div class="value" style="margin-top: 4px">
+            <span id="outputKwm">0.00</span>
+            <span class="unit-label">kWm</span>
           </div>
         </div>
         <div class="output-box box-hp">
           <label>Site</label>
-          <div id="outputHp" class="value" style="margin-top: 4px">0.00 HP</div>
+          <div class="value" style="margin-top: 4px">
+            <span id="outputHp">0.00</span>
+            <span class="unit-label">HP</span>
+          </div>
         </div>
       </div>
       <div class="input-group group-search">
@@ -620,6 +676,12 @@
             <button class="btn btn-weather" onclick="fetchLiveWeatherByZip()">
               GET ZIP
             </button>
+          </div>
+          <div class="pressure-box" aria-label="Barometric pressure">
+            <div id="pressureValue" class="pressure-value">
+              <span id="pressureNumber">29.23</span>
+              <span class="unit-label">inHg</span>
+            </div>
           </div>
         </div>
         <div id="weatherStatus" class="status-text"></div>
@@ -689,6 +751,7 @@
       const outputHp = document.getElementById("outputHp");
       const zipInput = document.getElementById("zipInput");
       const weatherStatus = document.getElementById("weatherStatus");
+      const pressureNumber = document.getElementById("pressureNumber");
       const baroToggle = document.getElementById("baroToggle");
       const liveBaroText = document.getElementById("liveBaroText");
       // Input Unit Toggle Elements
@@ -866,6 +929,7 @@
         if (baroToggle.checked) {
           liveStationPressureInHg = null; // WIPES ANY OLD ZIP PRESSURE CLEAN
           zipInput.value = ""; // Clears the ZIP box so there is no confusion
+          calculateMath();
           liveBaroText.style.visibility = "hidden";
           document.querySelector(".toggle-label").style.color = "#0056b3";
           if ("AbsoluteOrientationSensor" in window || "Sensor" in window) {
@@ -986,10 +1050,7 @@
                       console.log("Geoapify Error", geoErr);
                     }
                     weatherStatus.textContent =
-                      shortAddress +
-                      " " +
-                      liveStationPressureInHg.toFixed(2) +
-                      " inHg";
+                      shortAddress;
                     function formatStreetName(streetName) {
                       if (!streetName) return "";
                       return streetName
@@ -1141,7 +1202,7 @@
             cityState += ", " + stateCode;
           }
           weatherStatus.textContent =
-            cityState + " " + liveStationPressureInHg.toFixed(2) + " inHg";
+            cityState;
           weatherStatus.style.color = "#28a745";
         } catch (error) {
           console.error("API Connection Error:", error);
@@ -1167,6 +1228,7 @@
         const standardSeaLevel = 29.92; // True Earth atmospheric pressure at sea level
         const standardTempKelvin = 298.15; // 77 °F
         const ambientBaroPressure = getAmbientBaroPressure(altitude);
+        pressureNumber.textContent = ambientBaroPressure.toFixed(2);
         const baroPressure = turboToggle.checked
           ? Math.max(ambientBaroPressure, saeTargetPressure)
           : ambientBaroPressure;
@@ -1193,8 +1255,8 @@
           (528 / (460 + temp));
         finalHp = Math.max(0, finalHp - fanLossHp);
         finalKwm = finalHp / 1.34102209;
-        outputKwm.textContent = finalKwm.toFixed(2) + " kWm";
-        outputHp.textContent = finalHp.toFixed(2) + " HP";
+        outputKwm.textContent = finalKwm.toFixed(2);
+        outputHp.textContent = finalHp.toFixed(2);
       }
       function formatStateInitials(stateName) {
         if (!stateName) return "";
@@ -1271,7 +1333,7 @@
           parseInt(altitudeSlider.value),
         );
         weatherStatus.textContent =
-          "Zenith Plant " + ambientBaroPressure.toFixed(2) + " inHg";
+          "Zenith Plant";
         weatherStatus.style.color = "#000000";
         document.querySelector(".toggle-label").style.color = "#000000";
         calculateMath();
@@ -1288,7 +1350,8 @@
         humidityVal.textContent = "0 %";
         altitudeSlider.value = 0;
         altitudeVal.textContent = "0 Feet";
-        weatherStatus.textContent = "SAE Corrected 29.23 inHg";
+        zipInput.value = "";
+        weatherStatus.textContent = "SAE Corrected";
         weatherStatus.style.color = "#000000";
         document.querySelector(".toggle-label").style.color = "#000000";
         calculateMath();
